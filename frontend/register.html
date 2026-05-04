@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PrepSense — Register</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="auth">
+  <div class="box">
+    <h1 class="logo">Prep<span>Sense</span></h1>
+    <p class="tagline">Create your account</p>
+    <div id="err" class="err-box" style="display:none;"></div>
+    <div id="suc" class="suc-box" style="display:none;"></div>
+    <input type="text" id="name" placeholder="Full Name"/>
+    <input type="email" id="email" placeholder="Email"/>
+    <input type="password" id="password" placeholder="Password"/>
+    <button onclick="register()">Create Account</button>
+    <p class="link">Already have account? <a href="index.html">Login</a></p>
+  </div>
+  <script>
+    async function register() {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const err = document.getElementById('err');
+      const suc = document.getElementById('suc');
+      if (!name || !email || !password) { err.textContent = 'Fill all fields'; err.style.display = 'block'; return; }
+      try {
+        const res = await fetch('http://127.0.0.1:8000/signup', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({name, email, password})
+        });
+        const data = await res.json();
+        if (data.user_id) {
+          suc.textContent = 'Account created! Redirecting...';
+          suc.style.display = 'block';
+          setTimeout(() => window.location.href = 'index.html', 1500);
+        } else {
+          err.textContent = data.detail || 'Signup failed';
+          err.style.display = 'block';
+        }
+      } catch(e) {
+        err.textContent = 'Backend not running.';
+        err.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PrepSense — Login</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="auth">
+  <div class="box">
+    <h1 class="logo">Prep<span>Sense</span></h1>
+    <p class="tagline">AI Mock Interviewer</p>
+    <div id="err" class="err-box" style="display:none;"></div>
+    <input type="email" id="email" placeholder="Email"/>
+    <input type="password" id="password" placeholder="Password"/>
+    <button onclick="login()">Login</button>
+    <p class="link">New user? <a href="register.html">Sign Up</a></p>
+  </div>
+  <script>
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const err = document.getElementById('err');
+      if (!email || !password) { err.textContent = 'Fill all fields'; err.style.display = 'block'; return; }
+      try {
+        const res = await fetch('http://127.0.0.1:8000/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email, password})
+        });
+        const data = await res.json();
+        if (data.user_id) {
+          localStorage.setItem('user_id', data.user_id);
+          localStorage.setItem('user_name', data.name);
+          window.location.href = 'dashboard.html';
+        } else {
+          err.textContent = data.detail || 'Invalid credentials';
+          err.style.display = 'block';
+        }
+      } catch(e) {
+        err.textContent = 'Backend not running. Start uvicorn.';
+        err.style.display = 'block';
+      }
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+  </script>
+</body>
+</html>
