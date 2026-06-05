@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PrepSense — Resume Analyzer</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="dash">
+
+  <div class="navbar">
+    <div class="nav-logo">Prep<span>Sense</span></div>
+    <div class="nav-right">
+      Welcome, <strong id="uname"></strong>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">Resume <span>Analyzer</span></div>
+    <div style="font-size:13px;color:#888;margin-top:-16px;margin-bottom:24px;">
+      Fresher-focused resume analysis — get your ATS score and improvement tips
+    </div>
+
+    <div class="row">
+      <div class="card">
+        <div class="card-title">Upload Your Resume</div>
+
+        <div id="upload-area" style="border:2px dashed #534AB7;border-radius:12px;
+          padding:40px;text-align:center;cursor:pointer;background:#f9f8ff;
+          transition:background 0.2s;"
+          onclick="document.getElementById('resume-file').click()"
+          ondragover="event.preventDefault();this.style.background='#EEEDFE'"
+          ondragleave="this.style.background='#f9f8ff'"
+          ondrop="handleDrop(event)">
+          <div style="font-size:36px;margin-bottom:10px;">📄</div>
+          <div style="font-size:15px;font-weight:600;color:#534AB7;margin-bottom:6px;">
+            Click to upload or drag and drop
+          </div>
+          <div style="font-size:12px;color:#999;">PDF or TXT file — max 5MB</div>
+          <input type="file" id="resume-file" accept=".pdf,.txt"
+            style="display:none;" onchange="handleFileSelect(event)"/>
+        </div>
+
+        <div id="file-info" style="display:none;margin-top:12px;padding:10px 14px;
+          background:#f5f4ff;border-radius:8px;font-size:13px;color:#534AB7;
+          align-items:center;gap:8px;">
+          <span>📄</span>
+          <span id="file-name"></span>
+          <span id="file-size" style="color:#999;"></span>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div style="font-size:12px;color:#999;margin-bottom:8px;">
+            Or paste your resume text directly:
+          </div>
+          <textarea id="resume-text" placeholder="Paste your resume content here..."
+            style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;
+            font-size:13px;font-family:inherit;resize:vertical;min-height:150px;
+            outline:none;"></textarea>
+        </div>
+
+        <button class="btn" style="width:100%;margin-top:16px;font-size:15px;"
+          onclick="analyseResume()">
+          Analyse My Resume
+        </button>
+
+        <div id="loading" style="display:none;text-align:center;margin-top:16px;">
+          <div style="font-size:13px;color:#534AB7;margin-bottom:8px;">
+            Analysing your resume...
+          </div>
+          <div style="height:4px;background:#f0f0f0;border-radius:2px;overflow:hidden;">
+            <div id="progress-bar" style="height:100%;background:#534AB7;width:0%;
+              transition:width 0.3s;border-radius:2px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">What we check</div>
+        <div style="font-size:13px;color:#666;line-height:2;">
+          <div>📋 <strong>Essential sections</strong> — Contact, Education, Skills, Projects, Experience</div>
+          <div>🎯 <strong>ATS keywords</strong> — Technical skills, tools, languages</div>
+          <div>📏 <strong>Length and format</strong> — Is it 1 page? Proper structure?</div>
+          <div>💼 <strong>Projects section</strong> — Do you have enough projects?</div>
+          <div>🎓 <strong>Education details</strong> — CGPA, relevant courses</div>
+          <div>⚡ <strong>Action verbs</strong> — Built, Developed, Implemented</div>
+          <div>🔗 <strong>Links</strong> — GitHub, LinkedIn, portfolio</div>
+          <div>📊 <strong>Quantification</strong> — Numbers, percentages, impact</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT SECTION -->
+    <div id="result-section" style="display:none;">
+
+      <!-- ATS Score -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">ATS Score</div>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+          <div style="position:relative;width:120px;height:120px;flex-shrink:0;">
+            <canvas id="scoreChart" width="120" height="120"></canvas>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+              text-align:center;">
+              <div id="ats-score-num" style="font-size:28px;font-weight:700;color:#534AB7;">0</div>
+              <div style="font-size:11px;color:#999;">out of 100</div>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div id="ats-verdict" style="font-size:18px;font-weight:600;margin-bottom:8px;"></div>
+            <div id="ats-summary" style="font-size:13px;color:#666;line-height:1.6;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section scores + Missing -->
+      <div class="row" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title">Section Analysis</div>
+          <div id="section-bars"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Missing / Weak Areas</div>
+          <div id="missing-list"></div>
+        </div>
+      </div>
+
+      <!-- Good + Improve -->
+      <div class="row" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title">✅ What is good</div>
+          <div id="good-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 What to add or improve</div>
+          <div id="improve-list"></div>
+        </div>
+      </div>
+
+      <!-- Fresher tips -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">🎓 Fresher-specific tips</div>
+        <div id="fresher-tips"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('uname').textContent = localStorage.getItem('user_name') || '';
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    let scoreChartInstance = null;
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('upload-area').style.background = '#f9f8ff';
+      const file = e.dataTransfer.files[0];
+      if (file) processFile(file);
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) processFile(file);
+    }
+
+    function processFile(file) {
+      if (file.size > 5 * 1024 * 1024) { alert('File too large. Max 5MB.'); return; }
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-size').textContent = '(' + (file.size/1024).toFixed(0) + ' KB)';
+      document.getElementById('file-info').style.display = 'flex';
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('resume-text').value = e.target.result;
+      };
+      reader.readAsText(file);
+    }
+
+    async function analyseResume() {
+      const text = document.getElementById('resume-text').value.trim();
+      if (!text) { alert('Please upload a resume or paste your resume text'); return; }
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('result-section').style.display = 'none';
+
+      let prog = 0;
+      const progInterval = setInterval(() => {
+        prog = Math.min(prog + 10, 90);
+        document.getElementById('progress-bar').style.width = prog + '%';
+      }, 150);
+
+      try {
+        const res = await fetch('http://127.0.0.1:8000/analyse-resume', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({resume_text: text})
+        });
+        const data = await res.json();
+        clearInterval(progInterval);
+        document.getElementById('progress-bar').style.width = '100%';
+        setTimeout(() => {
+          document.getElementById('loading').style.display = 'none';
+          showResults(data);
+        }, 300);
+      } catch(e) {
+        clearInterval(progInterval);
+        document.getElementById('loading').style.display = 'none';
+        alert('Error analysing resume. Make sure backend is running.');
+      }
+    }
+
+    function showResults(data) {
+      document.getElementById('result-section').style.display = 'block';
+      document.getElementById('result-section').scrollIntoView({behavior:'smooth'});
+
+      const score = data.ats_score || 0;
+      document.getElementById('ats-score-num').textContent = score;
+
+      // Donut chart
+      if (scoreChartInstance) scoreChartInstance.destroy();
+      const color = score >= 70 ? '#1D9E75' : score >= 50 ? '#EF9F27' : '#E24B4A';
+      scoreChartInstance = new Chart(document.getElementById('scoreChart'), {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [score, 100 - score],
+            backgroundColor: [color, '#f0f0f0'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          cutout: '75%',
+          plugins: {legend: {display: false}},
+          animation: {duration: 800}
+        }
+      });
+
+      document.getElementById('ats-score-num').style.color = color;
+
+      if (score >= 80) {
+        document.getElementById('ats-verdict').textContent = '🟢 Strong Resume';
+        document.getElementById('ats-verdict').style.color = '#1D9E75';
+      } else if (score >= 60) {
+        document.getElementById('ats-verdict').textContent = '🟡 Good Resume';
+        document.getElementById('ats-verdict').style.color = '#EF9F27';
+      } else if (score >= 40) {
+        document.getElementById('ats-verdict').textContent = '🟠 Needs Improvement';
+        document.getElementById('ats-verdict').style.color = '#EF9F27';
+      } else {
+        document.getElementById('ats-verdict').textContent = '🔴 Major Issues';
+        document.getElementById('ats-verdict').style.color = '#E24B4A';
+      }
+
+      document.getElementById('ats-summary').textContent = data.summary || '';
+
+      // Section bars
+      const sectionColors = {
+        contact:'#534AB7', education:'#1D9E75', skills:'#EF9F27',
+        projects:'#E24B4A', experience:'#0F6E56', links:'#185FA5'
+      };
+      const sections = data.sections || {};
+      document.getElementById('section-bars').innerHTML =
+        Object.entries(sections).map(([k, v]) =>
+          '<div class="bar-row" style="margin-bottom:10px;">' +
+          '<span class="bar-label" style="width:90px;text-transform:capitalize;">' + k + '</span>' +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + v + '%;background:' +
+          (sectionColors[k]||'#534AB7') + ';"></div></div>' +
+          '<span class="bar-val">' + v + '%</span></div>'
+        ).join('');
+
+      // Missing
+      const missing = data.missing || [];
+      document.getElementById('missing-list').innerHTML = missing.length > 0
+        ? missing.map(m =>
+            '<div style="display:flex;gap:8px;margin-bottom:8px;font-size:13px;' +
+            'background:#fff0f0;padding:8px 10px;border-radius:6px;border-left:3px solid #E24B4A;">' +
+            '<span>❌</span><span>' + m + '</span></div>'
+          ).join('')
+        : '<div style="color:#1D9E75;font-size:13px;">No major sections missing!</div>';
+
+      // Good
+      const good = data.good || [];
+      document.getElementById('good-list').innerHTML = good.length > 0
+        ? good.map(g =>
+            '<div style="display:flex;gap:8px;margin-bottom:8px;font-size:13px;' +
+            'background:#f0fff4;padding:8px 10px;border-radius:6px;border-left:3px solid #1D9E75;">' +
+            '<span>✅</span><span>' + g + '</span></div>'
+          ).join('')
+        : '<div style="color:#999;font-size:13px;">No strengths found yet.</div>';
+
+      // Improve
+      const improve = data.improvements || [];
+      document.getElementById('improve-list').innerHTML = improve.length > 0
+        ? improve.map((imp, i) =>
+            '<div style="display:flex;gap:8px;margin-bottom:8px;font-size:13px;' +
+            'background:#f5f4ff;padding:8px 10px;border-radius:6px;">' +
+            '<span style="color:#534AB7;font-weight:700;flex-shrink:0;">' + (i+1) + '.</span>' +
+            '<span>' + imp + '</span></div>'
+          ).join('')
+        : '<div style="color:#999;font-size:13px;">No improvements needed.</div>';
+
+      // Fresher tips
+      const fresherTips = data.fresher_tips || [];
+      document.getElementById('fresher-tips').innerHTML = fresherTips.length > 0
+        ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-wrap:wrap;">' +
+          fresherTips.map(tip =>
+            '<div style="font-size:13px;background:#f9f9f9;padding:10px 12px;' +
+            'border-radius:8px;border-left:3px solid #534AB7;line-height:1.5;">' + tip + '</div>'
+          ).join('') + '</div>'
+        : '';
+    }
+  </script>
+</body>
+</html>
