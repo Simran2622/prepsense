@@ -4,48 +4,152 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PrepSense — Register</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fff; color: #0f172a; min-height: 100vh; display: flex; flex-direction: column; }
+    .navbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; border-bottom: 0.5px solid #e2e8f0; background: #fff; position: sticky; top: 0; z-index: 100; }
+    .nav-logo { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
+    .nav-logo span { color: #1a4fc4; }
+    .btn-primary { font-size: 14px; color: #fff; background: #1a4fc4; border: none; border-radius: 8px; cursor: pointer; padding: 10px 20px; font-weight: 500; font-family: inherit; transition: background 0.15s; text-decoration: none; display: inline-block; }
+    .btn-primary:hover { background: #1440a8; }
+    .main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 61px); }
+    .hero { padding: 64px 56px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+    .hero-grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(26,79,196,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(26,79,196,0.06) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
+    .hero-content { position: relative; z-index: 1; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #1a4fc4; margin-bottom: 24px; }
+    .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #1a4fc4; }
+    .hero-h1 { font-size: 48px; font-weight: 800; line-height: 1.05; letter-spacing: -2px; color: #0f172a; margin-bottom: 20px; }
+    .hero-h1 em { font-style: normal; color: #1a4fc4; }
+    .hero-sub { font-size: 16px; color: #64748b; line-height: 1.65; max-width: 400px; margin-bottom: 36px; }
+    .steps { display: flex; flex-direction: column; gap: 16px; margin-bottom: 36px; }
+    .step { display: flex; align-items: flex-start; gap: 14px; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: #1a4fc4; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-text { font-size: 14px; color: #374151; line-height: 1.5; }
+    .step-text strong { color: #0f172a; }
+    .social-proof { display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 0.5px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; max-width: 380px; }
+    .avatars { display: flex; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; margin-left: -8px; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: #fff; }
+    .avatar:first-child { margin-left: 0; }
+    .social-text { font-size: 13px; color: #64748b; }
+    .register-side { background: #f8fafc; border-left: 0.5px solid #e2e8f0; display: flex; align-items: center; justify-content: center; padding: 48px 40px; }
+    .register-box { width: 100%; max-width: 380px; }
+    .free-badge { display: inline-flex; align-items: center; gap: 6px; background: #eff0fe; color: #1a4fc4; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .free-dot { width: 6px; height: 6px; border-radius: 50%; background: #1a4fc4; }
+    .register-heading { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; color: #0f172a; margin-bottom: 6px; }
+    .register-subheading { font-size: 14px; color: #64748b; margin-bottom: 32px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+    .field input { width: 100%; padding: 12px 14px; border: 0.5px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; color: #0f172a; background: #fff; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .field input:focus { border-color: #1a4fc4; box-shadow: 0 0 0 3px rgba(26,79,196,0.1); }
+    .field input::placeholder { color: #9ca3af; }
+    .register-btn { width: 100%; padding: 13px; background: #1a4fc4; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s; margin-top: 6px; }
+    .register-btn:hover { background: #1440a8; }
+    .err-box { background: #fef2f2; color: #b91c1c; border: 0.5px solid #fecaca; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+    .suc-box { background: #f0fdf4; color: #15803d; border: 0.5px solid #bbf7d0; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+    .register-footer { margin-top: 20px; text-align: center; font-size: 13px; color: #64748b; }
+    .register-footer a { color: #1a4fc4; text-decoration: none; font-weight: 500; }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 20px; }
+    .divider-line { flex: 1; height: 0.5px; background: #e5e7eb; }
+    .divider-text { font-size: 11px; color: #9ca3af; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+    .check-dot { width: 16px; height: 16px; border-radius: 50%; background: #1a4fc4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .check-dot svg { width: 9px; height: 9px; stroke: #fff; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .cta-bar { background: #0f172a; padding: 18px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .cta-bar-text { font-size: 14px; color: #94a3b8; }
+    .cta-bar-text strong { color: #fff; }
+    @media (max-width: 900px) { .main { grid-template-columns: 1fr; } .hero { display: none; } .register-side { border-left: none; padding: 40px 24px; } .navbar { padding: 16px 24px; } }
+  </style>
 </head>
-<body class="auth">
-  <div class="box">
-    <h1 class="logo">Prep<span>Sense</span></h1>
-    <p class="tagline">Create your account</p>
-    <div id="err" class="err-box" style="display:none;"></div>
-    <div id="suc" class="suc-box" style="display:none;"></div>
-    <input type="text" id="name" placeholder="Full Name"/>
-    <input type="email" id="email" placeholder="Email"/>
-    <input type="password" id="password" placeholder="Password"/>
-    <button onclick="register()">Create Account</button>
-    <p class="link">Already have account? <a href="index.html">Login</a></p>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo">Prep<span>Sense</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="font-size:13px;color:#64748b;">Already have an account?</span>
+      <a href="index.html" class="btn-primary">Log in</a>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="hero">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-content">
+        <div class="eyebrow"><div class="eyebrow-dot"></div>Free to get started</div>
+        <h1 class="hero-h1">Your prep starts<br>here. Your <em>offer</em><br>starts there.</h1>
+        <p class="hero-sub">Join thousands of students who used PrepSense to walk into interviews confident and come out with offers.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><div class="step-text"><strong>Create your free account</strong> — takes under a minute.</div></div>
+          <div class="step"><div class="step-num">02</div><div class="step-text"><strong>Pick your target role</strong> — DSA, HR, System Design and more.</div></div>
+          <div class="step"><div class="step-num">03</div><div class="step-text"><strong>Practice with the AI interviewer</strong> — get scored and improve.</div></div>
+        </div>
+        <div class="social-proof">
+          <div class="avatars">
+            <div class="avatar" style="background:#1a4fc4;">S</div>
+            <div class="avatar" style="background:#0d9e6e;">R</div>
+            <div class="avatar" style="background:#d97706;">A</div>
+            <div class="avatar" style="background:#e24b4a;">P</div>
+          </div>
+          <div class="social-text"><strong>10,000+</strong> mock sessions completed so far</div>
+        </div>
+      </div>
+    </div>
+    <div class="register-side">
+      <div class="register-box">
+        <div class="free-badge"><div class="free-dot"></div>Free account — no credit card needed</div>
+        <div class="register-heading">Create your account</div>
+        <div class="register-subheading">Start practicing in under 3 minutes</div>
+        <div id="err" class="err-box" style="display:none;"></div>
+        <div id="suc" class="suc-box" style="display:none;"></div>
+        <div class="field"><label for="name">Full Name</label><input type="text" id="name" placeholder="Simran Jha"/></div>
+        <div class="field"><label for="email">Email</label><input type="email" id="email" placeholder="you@example.com"/></div>
+        <div class="field"><label for="password">Password</label><input type="password" id="password" placeholder="Create a password"/></div>
+        <button class="register-btn" onclick="register()">Create free account →</button>
+        <div class="register-footer">Already have an account? <a href="index.html">Sign in</a></div>
+        <div class="divider"><div class="divider-line"></div><span class="divider-text">what's included</span><div class="divider-line"></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#475569;"><div class="check-dot"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Unlimited AI mock interviews</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#475569;"><div class="check-dot"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>ATS resume analyzer</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#475569;"><div class="check-dot"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Performance analytics & score tracking</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#475569;"><div class="check-dot"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Eye contact & posture analysis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cta-bar">
+    <div class="cta-bar-text"><strong>PrepSense</strong> — the AI-powered interview operating system</div>
   </div>
   <script>
+    const API = 'http://localhost:8000';
     async function register() {
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       const err = document.getElementById('err');
       const suc = document.getElementById('suc');
-      if (!name || !email || !password) { err.textContent = 'Fill all fields'; err.style.display = 'block'; return; }
+      const btn = document.querySelector('.register-btn');
+      err.style.display = 'none'; suc.style.display = 'none';
+      if (!name || !email || !password) { err.textContent = 'Please fill in all fields.'; err.style.display = 'block'; return; }
+      btn.textContent = 'Creating account...'; btn.disabled = true; btn.style.opacity = '0.75';
       try {
-        const res = await fetch('http://127.0.0.1:8000/signup', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({name, email, password})
-        });
+        const res = await fetch(API + '/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password }) });
         const data = await res.json();
         if (data.user_id) {
-          suc.textContent = 'Account created! Redirecting...';
+          suc.textContent = '✓ Account created! Redirecting to login...';
           suc.style.display = 'block';
+          btn.textContent = '✓ Account created!';
           setTimeout(() => window.location.href = 'index.html', 1500);
         } else {
-          err.textContent = data.detail || 'Signup failed';
+          err.textContent = data.detail || 'Registration failed.';
           err.style.display = 'block';
+          btn.textContent = 'Create free account →'; btn.disabled = false; btn.style.opacity = '1';
         }
       } catch(e) {
-        err.textContent = 'Backend not running.';
+        err.textContent = 'Cannot reach server. Make sure uvicorn is running.';
         err.style.display = 'block';
+        btn.textContent = 'Create free account →'; btn.disabled = false; btn.style.opacity = '1';
       }
     }
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') register(); });
+    fetch(API + '/').catch(() => {});
   </script>
 </body>
 </html>

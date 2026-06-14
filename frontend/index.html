@@ -4,45 +4,196 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PrepSense — Login</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fff; color: #0f172a; min-height: 100vh; display: flex; flex-direction: column; }
+    .navbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; border-bottom: 0.5px solid #e2e8f0; background: #fff; position: sticky; top: 0; z-index: 100; }
+    .nav-logo { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
+    .nav-logo span { color: #1a4fc4; }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a { font-size: 14px; color: #64748b; text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .btn-ghost { font-size: 14px; color: #0f172a; background: none; border: none; cursor: pointer; padding: 8px 16px; font-family: inherit; }
+    .btn-primary { font-size: 14px; color: #fff; background: #1a4fc4; border: none; border-radius: 8px; cursor: pointer; padding: 10px 20px; font-weight: 500; font-family: inherit; transition: background 0.15s; text-decoration: none; display: inline-block; }
+    .btn-primary:hover { background: #1440a8; }
+    .main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 61px); }
+    .hero { padding: 64px 56px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+    .hero-grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(26,79,196,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(26,79,196,0.06) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
+    .hero-content { position: relative; z-index: 1; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #1a4fc4; margin-bottom: 24px; }
+    .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #1a4fc4; }
+    .hero-h1 { font-size: 52px; font-weight: 800; line-height: 1.03; letter-spacing: -2.5px; color: #0f172a; margin-bottom: 20px; }
+    .hero-h1 em { font-style: normal; color: #1a4fc4; }
+    .hero-sub { font-size: 16px; color: #64748b; line-height: 1.65; max-width: 400px; margin-bottom: 36px; }
+    .stats { display: flex; gap: 36px; margin-bottom: 36px; }
+    .stat-val { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: #0f172a; }
+    .stat-label { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #94a3b8; margin-top: 2px; }
+    .feature-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 32px; }
+    .fbox { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; padding: 16px 18px; display: flex; align-items: flex-start; gap: 12px; transition: border-color 0.15s, box-shadow 0.15s; }
+    .fbox:hover { border-color: #1a4fc4; box-shadow: 0 2px 12px rgba(26,79,196,0.08); }
+    .fbox-icon { width: 34px; height: 34px; border-radius: 9px; background: #eff6ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .fbox-icon svg { width: 16px; height: 16px; stroke: #1a4fc4; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .fbox-title { font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+    .fbox-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+    .session-card { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 14px; overflow: hidden; max-width: 340px; box-shadow: 0 8px 32px rgba(15,23,42,0.1); }
+    .session-header { background: #0f172a; padding: 12px 16px; display: flex; align-items: center; gap: 8px; }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
+    .session-meta { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }
+    .session-visual { height: 100px; background: linear-gradient(135deg, #1e3a5f, #1a4fc4 80%); display: flex; align-items: center; justify-content: center; }
+    .session-visual svg { opacity: 0.2; }
+    .session-question { padding: 14px 16px; border-top: 0.5px solid #e2e8f0; }
+    .q-num { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; }
+    .q-text { font-size: 14px; font-weight: 600; color: #0f172a; line-height: 1.4; }
+    .session-scores { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 0.5px solid #e2e8f0; }
+    .score-cell { padding: 12px 14px; }
+    .score-cell + .score-cell { border-left: 0.5px solid #e2e8f0; }
+    .score-metric { font-size: 9px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+    .score-val { font-size: 22px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
+    .login-side { background: #f8fafc; border-left: 0.5px solid #e2e8f0; display: flex; align-items: center; justify-content: center; padding: 48px 40px; }
+    .login-box { width: 100%; max-width: 380px; }
+    .login-heading { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; color: #0f172a; margin-bottom: 6px; }
+    .login-subheading { font-size: 14px; color: #64748b; margin-bottom: 32px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+    .field input { width: 100%; padding: 12px 14px; border: 0.5px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; color: #0f172a; background: #fff; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .field input:focus { border-color: #1a4fc4; box-shadow: 0 0 0 3px rgba(26,79,196,0.1); }
+    .field input::placeholder { color: #9ca3af; }
+    .login-btn { width: 100%; padding: 13px; background: #1a4fc4; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
+    .login-btn:hover { background: #1440a8; }
+    .err-box { background: #fef2f2; color: #b91c1c; border: 0.5px solid #fecaca; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+    .login-footer { margin-top: 20px; text-align: center; font-size: 13px; color: #64748b; }
+    .login-footer a { color: #1a4fc4; text-decoration: none; font-weight: 500; }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 20px; }
+    .divider-line { flex: 1; height: 0.5px; background: #e5e7eb; }
+    .divider-text { font-size: 11px; color: #9ca3af; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+    .features-row { display: flex; flex-direction: column; gap: 12px; }
+    .feature-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #475569; }
+    .feature-icon { width: 28px; height: 28px; border-radius: 7px; background: #eff6ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .feature-icon svg { width: 14px; height: 14px; stroke: #1a4fc4; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .cta-bar { background: #0f172a; padding: 20px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .cta-bar-text { font-size: 15px; font-weight: 600; color: #fff; letter-spacing: -0.3px; }
+    .cta-bar-sub { font-size: 13px; color: #64748b; margin-top: 2px; }
+    .cta-bar-checks { display: flex; gap: 20px; flex-wrap: wrap; }
+    .cta-check { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #94a3b8; }
+    .check-dot { width: 16px; height: 16px; border-radius: 50%; background: #1a4fc4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .check-dot svg { width: 9px; height: 9px; stroke: #fff; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; }
+      .hero { padding: 48px 24px; }
+      .hero-h1 { font-size: 36px; }
+      .session-card { display: none; }
+      .login-side { border-left: none; border-top: 0.5px solid #e2e8f0; }
+      .navbar { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .cta-bar { padding: 20px 24px; }
+      .cta-bar-checks { display: none; }
+    }
+  </style>
 </head>
-<body class="auth">
-  <div class="box">
-    <h1 class="logo">Prep<span>Sense</span></h1>
-    <p class="tagline">AI Mock Interviewer</p>
-    <div id="err" class="err-box" style="display:none;"></div>
-    <input type="email" id="email" placeholder="Email"/>
-    <input type="password" id="password" placeholder="Password"/>
-    <button onclick="login()">Login</button>
-    <p class="link">New user? <a href="register.html">Sign Up</a></p>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo">Prep<span>Sense</span></div>
+    <div class="nav-links"><a href="#">Features</a><a href="#">How it works</a><a href="#">Pricing</a></div>
+    <div class="nav-right">
+      <button class="btn-ghost" onclick="document.getElementById('email').focus()">Log in</button>
+      <a href="register.html" class="btn-primary">Get started</a>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="hero">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-content">
+        <div class="eyebrow"><div class="eyebrow-dot"></div> Built for the next interview season</div>
+        <h1 class="hero-h1">Walk into your<br><em>interview</em><br>already three<br>steps ahead.</h1>
+        <p class="hero-sub">PrepSense is the AI-powered mock interviewer for students and job seekers. Real feedback, real improvement.</p>
+        <div class="stats">
+          <div><div class="stat-val">10k+</div><div class="stat-label">Mock sessions</div></div>
+          <div><div class="stat-val">96%</div><div class="stat-label">Report usefulness</div></div>
+          <div><div class="stat-val">3.5x</div><div class="stat-label">Faster prep</div></div>
+        </div>
+        <div class="feature-boxes">
+          <div class="fbox"><div class="fbox-icon"><svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg></div><div><div class="fbox-title">Mock Interview</div><div class="fbox-desc">AI-powered HR, technical & behavioral rounds</div></div></div>
+          <div class="fbox"><div class="fbox-icon"><svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div><div><div class="fbox-title">Weekly Analysis</div><div class="fbox-desc">Track progress and surface weak areas</div></div></div>
+          <div class="fbox"><div class="fbox-icon"><svg viewBox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div class="fbox-title">Interview Questions</div><div class="fbox-desc">Curated bank filtered by role & difficulty</div></div></div>
+          <div class="fbox"><div class="fbox-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></div><div><div class="fbox-title">Live Sessions</div><div class="fbox-desc">Real-time eye contact & posture scoring</div></div></div>
+        </div>
+        <div class="session-card">
+          <div class="session-header"><div class="live-dot"></div><span class="session-meta">Live session · Technical · Hard</span></div>
+          <div class="session-visual"><svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg></div>
+          <div class="session-question"><div class="q-num">Question 03 / 05</div><div class="q-text">How would you design a rate limiter for a public API?</div></div>
+          <div class="session-scores">
+            <div class="score-cell"><div class="score-metric">Communication</div><div class="score-val">87</div></div>
+            <div class="score-cell"><div class="score-metric">Eye contact</div><div class="score-val">92</div></div>
+            <div class="score-cell"><div class="score-metric">Posture</div><div class="score-val">81</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="login-side">
+      <div class="login-box">
+        <div class="login-heading">Welcome back</div>
+        <div class="login-subheading">Sign in to your PrepSense account</div>
+        <div id="err" class="err-box" style="display:none;"></div>
+        <div class="field"><label for="email">Email</label><input type="email" id="email" placeholder="you@example.com"/></div>
+        <div class="field"><label for="password">Password</label><input type="password" id="password" placeholder="••••••••"/></div>
+        <button class="login-btn" onclick="login()">Sign in <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <div class="login-footer">New to PrepSense? <a href="register.html">Create a free account</a></div>
+        <div class="divider"><div class="divider-line"></div><span class="divider-text">what you get</span><div class="divider-line"></div></div>
+        <div class="features-row">
+          <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg></div>AI mock interviews — HR, technical & behavioral</div>
+          <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>Performance analytics & score tracking</div>
+          <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>Coding room with real code execution</div>
+          <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></div>Eye contact & posture analysis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cta-bar">
+    <div><div class="cta-bar-text">Your next interview isn't far away.</div><div class="cta-bar-sub">Create a free account and run your first mock session in under 3 minutes.</div></div>
+    <div class="cta-bar-checks">
+      <div class="cta-check"><div class="check-dot"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Unlimited mock interviews</div>
+      <div class="cta-check"><div class="check-dot"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>ATS resume audit</div>
+      <div class="cta-check"><div class="check-dot"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Real code execution</div>
+    </div>
   </div>
   <script>
+    const API = 'http://localhost:8000';
+
     async function login() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       const err = document.getElementById('err');
-      if (!email || !password) { err.textContent = 'Fill all fields'; err.style.display = 'block'; return; }
+      const btn = document.querySelector('.login-btn');
+      err.style.display = 'none';
+      if (!email || !password) { err.textContent = 'Please fill in both fields.'; err.style.display = 'block'; return; }
+      btn.innerHTML = 'Signing in...'; btn.disabled = true; btn.style.opacity = '0.75';
       try {
-        const res = await fetch('http://127.0.0.1:8000/login', {
+        const res = await fetch(API + '/login', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({email, password})
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
         });
         const data = await res.json();
         if (data.user_id) {
           localStorage.setItem('user_id', data.user_id);
           localStorage.setItem('user_name', data.name);
-          window.location.href = 'dashboard.html';
+          btn.innerHTML = '✓ Welcome back!';
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
         } else {
-          err.textContent = data.detail || 'Invalid credentials';
+          err.textContent = data.detail || 'Invalid email or password.';
           err.style.display = 'block';
+          btn.innerHTML = 'Sign in →'; btn.disabled = false; btn.style.opacity = '1';
         }
       } catch(e) {
-        err.textContent = 'Backend not running. Start uvicorn.';
+        err.textContent = 'Cannot reach server. Make sure uvicorn is running on port 8000.';
         err.style.display = 'block';
+        btn.innerHTML = 'Sign in →'; btn.disabled = false; btn.style.opacity = '1';
       }
     }
     document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+    fetch(API + '/').catch(() => {});
   </script>
 </body>
 </html>

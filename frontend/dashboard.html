@@ -4,109 +4,132 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PrepSense — Dashboard</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f1f4fb; color: #0f172a; min-height: 100vh; }
+    .navbar { background: #fff; border-bottom: 0.5px solid #e2e8f0; padding: 0 40px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .nav-logo { font-size: 19px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
+    .nav-logo span { color: #1a4fc4; }
+    .nav-right { display: flex; align-items: center; gap: 20px; font-size: 14px; color: #64748b; }
+    .nav-right strong { color: #0f172a; font-weight: 600; }
+    .nav-right a { color: #1a4fc4; text-decoration: none; font-weight: 500; font-size: 13px; }
+    .content { max-width: 1200px; margin: 0 auto; padding: 32px 32px 64px; }
+    .page-title { font-size: 24px; font-weight: 700; letter-spacing: -0.8px; color: #0f172a; margin-bottom: 24px; }
+    .page-title span { color: #1a4fc4; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .metric { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; }
+    .metric-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; margin-bottom: 10px; }
+    .metric-value { font-size: 34px; font-weight: 700; letter-spacing: -1px; color: #0f172a; line-height: 1; margin-bottom: 6px; }
+    .metric-sub { font-size: 12px; color: #94a3b8; }
+    .green { color: #0d9e6e; } .red { color: #e24b4a; } .purple { color: #1a4fc4; }
+    .card { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 14px; padding: 24px; }
+    .card-title { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 18px; letter-spacing: -0.2px; }
+    .weekly-card { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+    .weekly-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .weekly-title { font-size: 15px; font-weight: 600; color: #0f172a; }
+    .view-btn { padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #64748b; font-family: inherit; transition: all 0.15s; }
+    .view-btn.active { background: #1a4fc4; color: #fff; border-color: #1a4fc4; }
+    .weekly-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .wstat { border-radius: 10px; padding: 14px 16px; text-align: center; }
+    .wstat-label { font-size: 11px; color: #94a3b8; margin-bottom: 6px; font-weight: 500; }
+    .wstat-val { font-size: 24px; font-weight: 700; line-height: 1; }
+    .wstat-sub { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+    .wstat-purple { background: #eff0fe; } .wstat-purple .wstat-val { color: #1a4fc4; }
+    .wstat-green { background: #edfaf5; } .wstat-green .wstat-val { color: #0d9e6e; }
+    .wstat-amber { background: #fef9ec; } .wstat-amber .wstat-val { color: #d97706; }
+    .wstat-gray { background: #f8fafc; } .wstat-gray .wstat-val { color: #0f172a; }
+    .row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .topics { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .topic-btn { padding: 7px 16px; border: 1.5px solid #1a4fc4; border-radius: 20px; background: #fff; color: #1a4fc4; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .topic-btn.active, .topic-btn:hover { background: #1a4fc4; color: #fff; }
+    .btn { padding: 11px 22px; background: #1a4fc4; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+    .btn:hover { background: #1440a8; }
+    .btn-danger { background: #e74c3c; } .btn-danger:hover { background: #c0392b; }
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .bar-label { font-size: 12px; color: #64748b; width: 90px; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 6px; background: #f1f4fb; border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+    .bar-val { font-size: 12px; font-weight: 600; width: 34px; text-align: right; color: #0f172a; }
+    .q-box { background: #eff0fe; border-left: 3px solid #1a4fc4; border-radius: 0 8px 8px 0; padding: 14px; font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 14px; display: none; color: #0f172a; }
+    .answer-box { width: 100%; padding: 12px 14px; border: 0.5px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 120px; outline: none; display: none; color: #0f172a; transition: border-color 0.15s; }
+    .answer-box:focus { border-color: #1a4fc4; box-shadow: 0 0 0 3px rgba(26,79,196,0.08); }
+    .actions { display: flex; gap: 10px; margin-top: 12px; display: none; }
+    .mic-btn { padding: 10px 18px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; font-size: 14px; cursor: pointer; font-family: inherit; }
+    .result-box { display: none; margin-top: 20px; }
+    .score-big { text-align: center; font-size: 58px; font-weight: 800; line-height: 1; margin: 8px 0; letter-spacing: -2px; }
+    .score-label { text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 16px; }
+    .feedback-card { background: #eff0fe; border-left: 3px solid #1a4fc4; padding: 12px 14px; border-radius: 0 8px 8px 0; font-size: 13px; line-height: 1.7; color: #374151; margin-bottom: 12px; }
+    .hist-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 0.5px solid #f1f4fb; font-size: 13px; }
+    .badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: 600; flex-shrink: 0; margin-right: 8px; }
+    .b-dsa { background: #eff0fe; color: #1a4fc4; } .b-hr { background: #edfaf5; color: #0d9e6e; }
+    .b-os { background: #eff6ff; color: #185fa5; } .b-cn { background: #eaf3de; color: #3b6d11; }
+    .b-system_design { background: #fef2f2; color: #a32d2d; }
+    .custom-row { display: flex; gap: 8px; margin-top: 10px; }
+    .custom-row input { flex: 1; padding: 10px 14px; border: 0.5px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; color: #0f172a; }
+    .custom-row input:focus { border-color: #1a4fc4; }
+    .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 8px; }
+    .camera-section { background: #f8fafc; border: 0.5px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .mode-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    #session-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); z-index: 1000; overflow-y: auto; }
+    .modal-box { background: #fff; max-width: 600px; margin: 40px auto; border-radius: 16px; padding: 32px; position: relative; }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: #f1f4fb; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center; }
+    details summary { cursor: pointer; font-size: 13px; font-weight: 600; color: #1a4fc4; padding: 8px 0; user-select: none; }
+    #topic-breakdown { display: flex; gap: 8px; flex-wrap: wrap; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 9999; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    @media (max-width: 900px) { .metrics { grid-template-columns: repeat(2, 1fr); } .row { grid-template-columns: 1fr; } .weekly-stats { grid-template-columns: repeat(2, 1fr); } .content { padding: 20px 16px; } .navbar { padding: 0 20px; } }
+  </style>
 </head>
-<body class="dash">
-
-  <div class="navbar">
+<body>
+  <nav class="navbar">
     <div class="nav-logo">Prep<span>Sense</span></div>
     <div class="nav-right">
       Welcome, <strong id="uname"></strong>
       <a href="resume.html">📄 Resume</a>
       <a href="#" onclick="logout()">Logout</a>
     </div>
-  </div>
+  </nav>
+  <!-- set name immediately before rest of page loads -->
+  <script>
+    document.getElementById('uname').textContent = localStorage.getItem('user_name') || '';
+  </script>
 
   <div class="content">
     <div class="page-title">Your Interview <span>Dashboard</span></div>
-
     <div class="metrics">
-      <div class="metric">
-        <div class="metric-label">Total Sessions</div>
-        <div class="metric-value" id="m-total">0</div>
-        <div class="metric-sub">interviews done</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Average Score</div>
-        <div class="metric-value" id="m-avg">0</div>
-        <div class="metric-sub">out of 10</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Best Score</div>
-        <div class="metric-value green" id="m-best">0</div>
-        <div class="metric-sub">personal best</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Improvement</div>
-        <div class="metric-value" id="m-imp">—</div>
-        <div class="metric-sub">vs first sessions</div>
-      </div>
+      <div class="metric"><div class="metric-label">Total Sessions</div><div class="metric-value" id="m-total">0</div><div class="metric-sub">interviews done</div></div>
+      <div class="metric"><div class="metric-label">Average Score</div><div class="metric-value" id="m-avg">0</div><div class="metric-sub">out of 10</div></div>
+      <div class="metric"><div class="metric-label">Best Score</div><div class="metric-value green" id="m-best">0</div><div class="metric-sub">personal best</div></div>
+      <div class="metric"><div class="metric-label">Improvement</div><div class="metric-value" id="m-imp">—</div><div class="metric-sub">vs first sessions</div></div>
     </div>
-
-    <!-- WEEKLY PROGRESS -->
-    <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-        <div class="card-title" style="margin:0;">📅 Weekly Progress Report</div>
-        <div style="display:flex;gap:8px;">
-          <button class="topic-btn active" id="view-daily" onclick="switchView('daily')">Daily</button>
-          <button class="topic-btn" id="view-weekly" onclick="switchView('weekly')">Weekly</button>
+    <div class="weekly-card">
+      <div class="weekly-header">
+        <div class="weekly-title">📅 Weekly Progress Report</div>
+        <div style="display:flex;gap:6px;">
+          <button class="view-btn active" id="view-daily" onclick="switchView('daily')">Daily</button>
+          <button class="view-btn" id="view-weekly" onclick="switchView('weekly')">Weekly</button>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
-        <div style="background:#f5f4ff;border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:11px;color:#999;margin-bottom:4px;">Days active (30d)</div>
-          <div style="font-size:22px;font-weight:700;color:#534AB7;" id="days-active">0</div>
-        </div>
-        <div style="background:#f0fff4;border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:11px;color:#999;margin-bottom:4px;">Current streak</div>
-          <div style="font-size:22px;font-weight:700;color:#1D9E75;" id="streak-count">0</div>
-          <div style="font-size:10px;color:#999;">days</div>
-        </div>
-        <div style="background:#fff3cd;border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:11px;color:#999;margin-bottom:4px;">Best day</div>
-          <div style="font-size:12px;font-weight:600;color:#EF9F27;margin-top:4px;" id="best-day-text">—</div>
-        </div>
-        <div style="background:#f9f9f9;border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:11px;color:#999;margin-bottom:4px;">Best week avg</div>
-          <div style="font-size:22px;font-weight:700;color:#1a1a2e;" id="best-week-score">—</div>
-        </div>
+      <div class="weekly-stats">
+        <div class="wstat wstat-purple"><div class="wstat-label">Days active (30d)</div><div class="wstat-val" id="days-active">0</div></div>
+        <div class="wstat wstat-green"><div class="wstat-label">Current streak</div><div class="wstat-val" id="streak-count">0</div><div class="wstat-sub">days</div></div>
+        <div class="wstat wstat-amber"><div class="wstat-label">Best day</div><div class="wstat-val" style="font-size:13px;font-weight:600;" id="best-day-text">—</div></div>
+        <div class="wstat wstat-gray"><div class="wstat-label">Best week avg</div><div class="wstat-val" id="best-week-score">—</div></div>
       </div>
-      <div id="daily-view">
-        <div style="font-size:12px;color:#999;margin-bottom:8px;">Sessions per day — last 30 days</div>
-        <canvas id="dailyChart" height="80"></canvas>
-      </div>
-      <div id="weekly-view" style="display:none;">
-        <div style="font-size:12px;color:#999;margin-bottom:8px;">Score trend — last 8 weeks</div>
-        <canvas id="weeklyChart" height="80"></canvas>
-      </div>
-      <div style="margin-top:16px;">
-        <div style="font-size:12px;color:#999;margin-bottom:8px;">Sessions by topic this month</div>
-        <div id="topic-breakdown" style="display:flex;gap:8px;flex-wrap:wrap;">
-          <div style="color:#bbb;font-size:13px;">No data yet</div>
-        </div>
-      </div>
+      <div id="daily-view"><div class="section-label">Sessions per day — last 30 days</div><canvas id="dailyChart" height="80"></canvas></div>
+      <div id="weekly-view" style="display:none;"><div class="section-label">Score trend — last 8 weeks</div><canvas id="weeklyChart" height="80"></canvas></div>
+      <div style="margin-top:18px;"><div class="section-label">Sessions by topic this month</div><div id="topic-breakdown"><div style="color:#cbd5e1;font-size:13px;">No data yet</div></div></div>
     </div>
-
     <div class="row">
-      <div class="card">
-        <div class="card-title">Score trend — last 14 sessions</div>
-        <canvas id="trendChart" height="130"></canvas>
-        <div id="no-data" style="display:none;text-align:center;color:#bbb;font-size:13px;padding:40px 0;">
-          No sessions yet — start practicing below!
-        </div>
-      </div>
+      <div class="card"><div class="card-title">Score trend — last 14 sessions</div><canvas id="trendChart" height="130"></canvas><div id="no-data" style="display:none;text-align:center;color:#cbd5e1;font-size:13px;padding:40px 0;">No sessions yet — start practicing below!</div></div>
       <div class="card">
         <div class="card-title">Performance by topic</div>
-        <div id="mode-bars"><div style="color:#bbb;font-size:13px;">No data yet</div></div>
-        <div style="margin-top:20px;">
-          <div class="card-title">Weakest area</div>
-          <div id="weakest-box" style="font-size:18px;font-weight:700;color:#E24B4A;">—</div>
-          <div id="weakest-tip" style="font-size:12px;color:#888;margin-top:4px;"></div>
-        </div>
+        <div id="mode-bars"><div style="color:#cbd5e1;font-size:13px;">No data yet</div></div>
+        <div style="margin-top:22px;"><div class="card-title">Weakest area</div><div id="weakest-box" style="font-size:20px;font-weight:700;color:#e24b4a;">—</div><div id="weakest-tip" style="font-size:12px;color:#94a3b8;margin-top:4px;"></div></div>
       </div>
     </div>
-
     <div class="row">
       <div class="card">
         <div class="card-title">Practice Interview</div>
@@ -117,314 +140,172 @@
           <button class="topic-btn" onclick="setTopic('cn',this)">CN</button>
           <button class="topic-btn" onclick="setTopic('system_design',this)">System Design</button>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <div class="mode-tabs">
           <button class="topic-btn active" id="mode-btn-1" onclick="setPracticeMode(1)">📝 App gives question</button>
           <button class="topic-btn" id="mode-btn-2" onclick="setPracticeMode(2)">🤖 Get model answer</button>
           <button class="topic-btn" id="mode-btn-3" onclick="setPracticeMode(3)">🔍 Compare my answer</button>
         </div>
-
-        <div id="camera-section" style="display:none;margin-bottom:16px;background:#f9f9f9;border-radius:12px;padding:16px;border:1px solid #eee;">
-          <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:10px;">📷 HR Presence Analysis</div>
+        <div id="camera-section" class="camera-section" style="display:none;">
+          <div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:12px;">📷 HR Presence Analysis</div>
           <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;">
-            <div style="position:relative;">
-              <video id="cam-feed" width="200" height="150" style="border-radius:8px;background:#000;display:block;" autoplay muted></video>
-              <canvas id="cam-canvas" width="200" height="150" style="position:absolute;top:0;left:0;border-radius:8px;opacity:0;"></canvas>
-            </div>
+            <div style="position:relative;"><video id="cam-feed" width="200" height="150" style="border-radius:8px;background:#0f172a;display:block;" autoplay muted></video><canvas id="cam-canvas" width="200" height="150" style="position:absolute;top:0;left:0;border-radius:8px;opacity:0;"></canvas></div>
             <div style="flex:1;min-width:160px;">
-              <div id="cam-status" style="font-size:12px;color:#999;margin-bottom:10px;">Click Start Camera to begin analysis</div>
-              <div class="bar-row">
-                <span class="bar-label" style="width:100px;font-size:12px;">👁 Eye contact</span>
-                <div class="bar-track"><div class="bar-fill" id="cam-eye" style="width:0%;background:#1D9E75;transition:width 0.5s;"></div></div>
-                <span class="bar-val" id="cam-eye-val">—</span>
-              </div>
-              <div class="bar-row">
-                <span class="bar-label" style="width:100px;font-size:12px;">🧍 Posture</span>
-                <div class="bar-track"><div class="bar-fill" id="cam-posture" style="width:0%;background:#534AB7;transition:width 0.5s;"></div></div>
-                <span class="bar-val" id="cam-posture-val">—</span>
-              </div>
-              <div class="bar-row">
-                <span class="bar-label" style="width:100px;font-size:12px;">💡 Lighting</span>
-                <div class="bar-track"><div class="bar-fill" id="cam-light" style="width:0%;background:#EF9F27;transition:width 0.5s;"></div></div>
-                <span class="bar-val" id="cam-light-val">—</span>
-              </div>
-              <div id="cam-tip" style="font-size:12px;color:#666;margin-top:8px;background:#fff;padding:8px;border-radius:6px;border-left:3px solid #534AB7;"></div>
+              <div id="cam-status" style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Click Start Camera to begin analysis</div>
+              <div class="bar-row"><span class="bar-label">👁 Eye contact</span><div class="bar-track"><div class="bar-fill" id="cam-eye" style="width:0%;background:#0d9e6e;transition:width 0.5s;"></div></div><span class="bar-val" id="cam-eye-val">—</span></div>
+              <div class="bar-row"><span class="bar-label">🧍 Posture</span><div class="bar-track"><div class="bar-fill" id="cam-posture" style="width:0%;background:#1a4fc4;transition:width 0.5s;"></div></div><span class="bar-val" id="cam-posture-val">—</span></div>
+              <div class="bar-row"><span class="bar-label">💡 Lighting</span><div class="bar-track"><div class="bar-fill" id="cam-light" style="width:0%;background:#d97706;transition:width 0.5s;"></div></div><span class="bar-val" id="cam-light-val">—</span></div>
+              <div class="bar-row"><span class="bar-label">🎯 Focus</span><div class="bar-track"><div class="bar-fill" id="cam-focus" style="width:0%;background:#e24b4a;transition:width 0.5s;"></div></div><span class="bar-val" id="cam-focus-val">—</span></div>
+              <div id="cam-tip" style="font-size:12px;color:#374151;margin-top:8px;background:#fff;padding:8px 10px;border-radius:6px;border-left:3px solid #1a4fc4;"></div>
               <div style="display:flex;gap:8px;margin-top:10px;">
                 <button class="btn" style="padding:8px 16px;font-size:13px;" onclick="startCamera()">Start Camera</button>
-                <button class="btn" style="padding:8px 16px;font-size:13px;background:#e74c3c;" onclick="stopCamera()">Stop</button>
+                <button class="btn btn-danger" style="padding:8px 16px;font-size:13px;" onclick="stopCamera()">Stop</button>
               </div>
             </div>
           </div>
         </div>
-
         <div id="mode1-section">
           <button class="btn" onclick="getQuestion()" style="margin-bottom:14px;">Get Random Question</button>
           <div style="margin-bottom:14px;">
-            <div style="font-size:12px;color:#999;margin-bottom:6px;">Or type your own question:</div>
-            <div class="custom-row">
-              <input type="text" id="custom-q" placeholder="e.g. What is deadlock? / Explain TCP handshake..." onkeydown="if(event.key==='Enter') askCustom()"/>
-              <button class="btn" onclick="askCustom()">Ask</button>
-            </div>
+            <div class="section-label">Or type your own question</div>
+            <div class="custom-row"><input type="text" id="custom-q" placeholder="e.g. What is deadlock?" onkeydown="if(event.key==='Enter') askCustom()"/><button class="btn" onclick="askCustom()">Ask</button></div>
           </div>
           <div class="q-box" id="q-box"></div>
           <textarea class="answer-box" id="answer" placeholder="Type your answer here..." oninput="liveAnalyse()"></textarea>
-          <div id="live-panel" style="display:none;margin-top:12px;background:#f9f9f9;border-radius:10px;padding:14px;border:1px solid #eee;">
-            <div style="font-size:12px;font-weight:600;color:#1a1a2e;margin-bottom:10px;">⚡ Live answer analysis</div>
-            <div class="bar-row">
-              <span class="bar-label" style="width:140px;font-size:12px;">✅ Covered so far</span>
-              <div class="bar-track"><div class="bar-fill" id="live-correct" style="width:0%;background:#1D9E75;transition:width 0.3s;"></div></div>
-              <span class="bar-val green" id="live-correct-val">0%</span>
-            </div>
-            <div class="bar-row">
-              <span class="bar-label" style="width:140px;font-size:12px;">📈 Still needed</span>
-              <div class="bar-track"><div class="bar-fill" id="live-missing" style="width:100%;background:#EF9F27;transition:width 0.3s;"></div></div>
-              <span class="bar-val" style="color:#EF9F27;" id="live-missing-val">100%</span>
-            </div>
+          <div id="live-panel" style="display:none;margin-top:12px;background:#f8fafc;border-radius:10px;padding:14px;border:0.5px solid #e2e8f0;">
+            <div style="font-size:12px;font-weight:600;color:#0f172a;margin-bottom:10px;">⚡ Live answer analysis</div>
+            <div class="bar-row"><span class="bar-label" style="width:140px;font-size:12px;">✅ Covered so far</span><div class="bar-track"><div class="bar-fill" id="live-correct" style="width:0%;background:#0d9e6e;"></div></div><span class="bar-val green" id="live-correct-val">0%</span></div>
+            <div class="bar-row"><span class="bar-label" style="width:140px;font-size:12px;">📈 Still needed</span><div class="bar-track"><div class="bar-fill" id="live-missing" style="width:100%;background:#d97706;"></div></div><span class="bar-val" style="color:#d97706;" id="live-missing-val">100%</span></div>
             <div style="margin-top:8px;font-size:12px;" id="live-words"></div>
-            <div style="margin-top:6px;font-size:12px;color:#555;" id="live-hint"></div>
+            <div style="margin-top:6px;font-size:12px;color:#374151;" id="live-hint"></div>
           </div>
           <div class="actions" id="actions">
             <button class="btn" style="flex:1;" onclick="submitAnswer()">Submit Answer</button>
             <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤 Speak</button>
           </div>
         </div>
-
         <div id="mode2-section" style="display:none;">
-          <div style="font-size:13px;color:#666;margin-bottom:10px;">Type any question and get a perfect model answer instantly.</div>
-          <div class="custom-row">
-            <input type="text" id="model-q-input" placeholder="e.g. What is a deadlock? / Explain binary search..." onkeydown="if(event.key==='Enter') getModelAnswer()"/>
-            <button class="btn" onclick="getModelAnswer()">Get Answer</button>
-          </div>
-          <div id="model-answer-box" style="display:none;margin-top:14px;background:#f5f4ff;border-left:3px solid #534AB7;padding:14px;border-radius:0 8px 8px 0;font-size:14px;line-height:1.8;color:#1a1a2e;"></div>
+          <div style="font-size:13px;color:#64748b;margin-bottom:12px;">Type any question and get a perfect model answer instantly.</div>
+          <div class="custom-row"><input type="text" id="model-q-input" placeholder="e.g. What is a deadlock?" onkeydown="if(event.key==='Enter') getModelAnswer()"/><button class="btn" onclick="getModelAnswer()">Get Answer</button></div>
+          <div id="model-answer-box" style="display:none;margin-top:14px;background:#eff0fe;border-left:3px solid #1a4fc4;padding:14px;border-radius:0 8px 8px 0;font-size:14px;line-height:1.8;color:#0f172a;"></div>
           <div id="model-key-points" style="display:none;margin-top:12px;"></div>
         </div>
-
         <div id="mode3-section" style="display:none;">
-          <div style="font-size:13px;color:#666;margin-bottom:12px;">Type a question and your answer. The app will compare it with the ideal answer.</div>
-          <div style="margin-bottom:10px;">
-            <div style="font-size:12px;font-weight:600;color:#444;margin-bottom:6px;">Your question:</div>
-            <input type="text" id="compare-q" placeholder="e.g. Explain deadlock and prevention..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none;font-family:inherit;"/>
-          </div>
-          <div style="margin-bottom:10px;">
-            <div style="font-size:12px;font-weight:600;color:#444;margin-bottom:6px;">Your answer:</div>
-            <textarea id="compare-ans" placeholder="Write your answer here..." style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:120px;outline:none;" oninput="liveCompare()"></textarea>
-          </div>
-          <div id="compare-live" style="display:none;background:#f9f9f9;border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid #eee;font-size:12px;">
-            <div class="bar-row">
-              <span class="bar-label" style="width:120px;">✅ Matching</span>
-              <div class="bar-track"><div class="bar-fill" id="cmp-match" style="width:0%;background:#1D9E75;transition:width 0.3s;"></div></div>
-              <span class="bar-val green" id="cmp-match-val">0%</span>
-            </div>
-            <div class="bar-row">
-              <span class="bar-label" style="width:120px;">❌ Missing</span>
-              <div class="bar-track"><div class="bar-fill" id="cmp-miss" style="width:100%;background:#E24B4A;transition:width 0.3s;"></div></div>
-              <span class="bar-val red" id="cmp-miss-val">100%</span>
-            </div>
+          <div style="font-size:13px;color:#64748b;margin-bottom:12px;">Type a question and your answer. The app will compare it with the ideal answer.</div>
+          <div style="margin-bottom:10px;"><div class="section-label">Your question</div><input type="text" id="compare-q" placeholder="e.g. Explain deadlock..." style="width:100%;padding:10px 14px;border:0.5px solid #d1d5db;border-radius:8px;font-size:14px;font-family:inherit;outline:none;color:#0f172a;"/></div>
+          <div style="margin-bottom:12px;"><div class="section-label">Your answer</div><textarea id="compare-ans" placeholder="Write your answer here..." style="width:100%;padding:12px 14px;border:0.5px solid #d1d5db;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:120px;outline:none;color:#0f172a;" oninput="liveCompare()"></textarea></div>
+          <div id="compare-live" style="display:none;background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;border:0.5px solid #e2e8f0;font-size:12px;">
+            <div class="bar-row"><span class="bar-label" style="width:120px;">✅ Matching</span><div class="bar-track"><div class="bar-fill" id="cmp-match" style="width:0%;background:#0d9e6e;"></div></div><span class="bar-val green" id="cmp-match-val">0%</span></div>
+            <div class="bar-row"><span class="bar-label" style="width:120px;">❌ Missing</span><div class="bar-track"><div class="bar-fill" id="cmp-miss" style="width:100%;background:#e24b4a;"></div></div><span class="bar-val red" id="cmp-miss-val">100%</span></div>
             <div style="margin-top:6px;" id="cmp-live-hint"></div>
           </div>
           <button class="btn" style="width:100%;" onclick="compareAnswers()">Compare My Answer</button>
           <div id="compare-result" style="display:none;margin-top:16px;"></div>
         </div>
-
         <div class="result-box" id="result-box">
           <div class="card-title" style="margin-top:16px;">Your Result</div>
           <div class="score-big" id="score-num">0</div>
           <div class="score-label">out of 10</div>
-          <div style="background:#f9f9f9;border-radius:10px;padding:14px;margin:14px 0;">
-            <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#1a1a2e;">Answer Analysis</div>
-            <div class="bar-row">
-              <span class="bar-label" style="width:150px;font-size:12px;">✅ Correct</span>
-              <div class="bar-track"><div class="bar-fill" id="pct-correct" style="width:0%;background:#1D9E75;"></div></div>
-              <span class="bar-val green" id="val-correct">0%</span>
-            </div>
-            <div class="bar-row">
-              <span class="bar-label" style="width:150px;font-size:12px;">❌ Incorrect/Missing</span>
-              <div class="bar-track"><div class="bar-fill" id="pct-wrong" style="width:0%;background:#E24B4A;"></div></div>
-              <span class="bar-val red" id="val-wrong">0%</span>
-            </div>
-            <div class="bar-row">
-              <span class="bar-label" style="width:150px;font-size:12px;">📈 Improvement needed</span>
-              <div class="bar-track"><div class="bar-fill" id="pct-imp" style="width:0%;background:#EF9F27;"></div></div>
-              <span class="bar-val" style="color:#EF9F27;" id="val-imp">0%</span>
-            </div>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;margin:14px 0;border:0.5px solid #e2e8f0;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#0f172a;">Answer Analysis</div>
+            <div class="bar-row"><span class="bar-label" style="width:150px;font-size:12px;">✅ Correct</span><div class="bar-track"><div class="bar-fill" id="pct-correct" style="width:0%;background:#0d9e6e;"></div></div><span class="bar-val green" id="val-correct">0%</span></div>
+            <div class="bar-row"><span class="bar-label" style="width:150px;font-size:12px;">❌ Incorrect/Missing</span><div class="bar-track"><div class="bar-fill" id="pct-wrong" style="width:0%;background:#e24b4a;"></div></div><span class="bar-val red" id="val-wrong">0%</span></div>
+            <div class="bar-row"><span class="bar-label" style="width:150px;font-size:12px;">📈 Improvement needed</span><div class="bar-track"><div class="bar-fill" id="pct-imp" style="width:0%;background:#d97706;"></div></div><span class="bar-val" style="color:#d97706;" id="val-imp">0%</span></div>
           </div>
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#1a1a2e;">Score breakdown</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#0f172a;">Score breakdown</div>
           <div id="dim-bars" style="margin-bottom:14px;"></div>
           <div class="feedback-card" id="feedback-card"></div>
           <div id="issue-list" style="margin:12px 0;"></div>
-          <details>
-            <summary>See model answer</summary>
-            <div id="model-ans" style="margin-top:10px;font-size:13px;line-height:1.7;color:#444;background:#f9f9f9;padding:14px;border-radius:8px;"></div>
-          </details>
+          <details><summary>See model answer</summary><div id="model-ans" style="margin-top:10px;font-size:13px;line-height:1.7;color:#374151;background:#f8fafc;padding:14px;border-radius:8px;"></div></details>
           <button class="btn" style="width:100%;margin-top:16px;" onclick="getQuestion()">Next Question</button>
         </div>
       </div>
-
       <div class="card">
         <div class="card-title">Recent Sessions</div>
-        <div id="hist-list">
-          <div style="color:#bbb;font-size:13px;text-align:center;padding:20px;">No sessions yet.</div>
-        </div>
-        <div style="margin-top:24px;">
-          <div class="card-title">AI Feedback</div>
-          <div class="feedback-card" id="ai-feedback">Complete a session to see personalised feedback here.</div>
-        </div>
+        <div id="hist-list"><div style="color:#cbd5e1;font-size:13px;text-align:center;padding:20px 0;">No sessions yet.</div></div>
+        <div style="margin-top:24px;"><div class="card-title">AI Feedback</div><div class="feedback-card" id="ai-feedback">Complete a session to see personalised feedback here.</div></div>
       </div>
     </div>
-
-    <!-- SESSION SUMMARY MODAL -->
-    <div id="session-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;overflow-y:auto;">
-      <div style="background:#fff;max-width:600px;margin:40px auto;border-radius:16px;padding:32px;position:relative;">
-        <button onclick="closeSessionSummary()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#999;">✕</button>
-        <div style="text-align:center;margin-bottom:24px;">
-          <div style="font-size:13px;color:#999;margin-bottom:4px;">Session Complete</div>
-          <div style="font-size:28px;font-weight:700;color:#1a1a2e;">Your Session Report</div>
-        </div>
-        <div id="ss-overall" style="text-align:center;padding:20px;border-radius:12px;margin-bottom:20px;background:#f9f9f9;">
-          <div style="font-size:40px;font-weight:700;" id="ss-avg">0</div>
-          <div style="font-size:13px;color:#999;margin-bottom:8px;">average score out of 10</div>
-          <div style="font-size:16px;font-weight:600;" id="ss-verdict">—</div>
-          <div style="font-size:13px;color:#666;margin-top:4px;" id="ss-msg">—</div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-          <div style="background:#f5f4ff;border-radius:8px;padding:12px;text-align:center;">
-            <div style="font-size:11px;color:#999;">Questions</div>
-            <div style="font-size:22px;font-weight:700;color:#534AB7;" id="ss-total">0</div>
-          </div>
-          <div style="background:#f0fff4;border-radius:8px;padding:12px;text-align:center;">
-            <div style="font-size:11px;color:#999;">Best score</div>
-            <div style="font-size:22px;font-weight:700;color:#1D9E75;" id="ss-best">0</div>
-          </div>
-          <div style="background:#fff0f0;border-radius:8px;padding:12px;text-align:center;">
-            <div style="font-size:11px;color:#999;">Lowest score</div>
-            <div style="font-size:22px;font-weight:700;color:#E24B4A;" id="ss-worst">0</div>
-          </div>
-        </div>
-        <div style="margin-bottom:20px;">
-          <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:10px;">Score distribution</div>
-          <div id="ss-distribution"></div>
-        </div>
-        <div style="margin-bottom:20px;">
-          <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:10px;">Performance by topic</div>
-          <div id="ss-topics"></div>
-          <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
-            <div style="flex:1;background:#f0fff4;border-radius:8px;padding:10px;min-width:120px;">
-              <div style="font-size:11px;color:#999;">Strongest</div>
-              <div style="font-size:14px;font-weight:700;color:#1D9E75;" id="ss-strongest">—</div>
-            </div>
-            <div style="flex:1;background:#fff0f0;border-radius:8px;padding:10px;min-width:120px;">
-              <div style="font-size:11px;color:#999;">Needs most work</div>
-              <div style="font-size:14px;font-weight:700;color:#E24B4A;" id="ss-weakest">—</div>
-            </div>
-          </div>
-        </div>
-        <div style="background:#f5f4ff;border-radius:10px;padding:16px;margin-bottom:20px;">
-          <div style="font-size:13px;font-weight:600;color:#534AB7;margin-bottom:8px;">📚 What to study next</div>
-          <div style="font-size:13px;color:#444;line-height:1.6;" id="ss-study-plan">—</div>
-        </div>
-        <div style="margin-bottom:20px;">
-          <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:10px;">Question by question</div>
-          <div id="ss-questions"></div>
-        </div>
-        <button class="btn" style="width:100%;font-size:15px;" onclick="closeSessionSummary()">Continue Practicing</button>
-      </div>
-    </div>
-
   </div>
 
-  <script>
-    const userId = localStorage.getItem('user_id');
-    const userName = localStorage.getItem('user_name');
-    if (!userId) window.location.href = 'index.html';
-    document.getElementById('uname').textContent = userName || '';
+  <div id="session-modal">
+    <div class="modal-box">
+      <button onclick="closeSessionSummary()" class="modal-close">✕</button>
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">Session Complete</div>
+        <div style="font-size:26px;font-weight:700;color:#0f172a;letter-spacing:-0.8px;">Your Session Report</div>
+      </div>
+      <div style="text-align:center;padding:20px;border-radius:12px;margin-bottom:20px;background:#f8fafc;border:0.5px solid #e2e8f0;">
+        <div style="font-size:44px;font-weight:800;letter-spacing:-2px;" id="ss-avg">0</div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:8px;">average score out of 10</div>
+        <div style="font-size:16px;font-weight:600;" id="ss-verdict">—</div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px;" id="ss-msg">—</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+        <div class="wstat wstat-purple"><div class="wstat-label">Questions</div><div class="wstat-val" id="ss-total">0</div></div>
+        <div class="wstat wstat-green"><div class="wstat-label">Best score</div><div class="wstat-val" id="ss-best">0</div></div>
+        <div style="background:#fef2f2;border-radius:10px;padding:14px;text-align:center;"><div class="wstat-label">Lowest score</div><div style="font-size:24px;font-weight:700;color:#e24b4a;" id="ss-worst">0</div></div>
+      </div>
+      <div style="margin-bottom:20px;"><div class="section-label">Score distribution</div><div id="ss-distribution"></div></div>
+      <div style="margin-bottom:20px;">
+        <div class="section-label">Performance by topic</div>
+        <div id="ss-topics"></div>
+        <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+          <div style="flex:1;background:#edfaf5;border-radius:8px;padding:10px;min-width:120px;"><div style="font-size:11px;color:#94a3b8;">Strongest</div><div style="font-size:14px;font-weight:700;color:#0d9e6e;" id="ss-strongest">—</div></div>
+          <div style="flex:1;background:#fef2f2;border-radius:8px;padding:10px;min-width:120px;"><div style="font-size:11px;color:#94a3b8;">Needs most work</div><div style="font-size:14px;font-weight:700;color:#e24b4a;" id="ss-weakest">—</div></div>
+        </div>
+      </div>
+      <div style="background:#eff0fe;border-radius:10px;padding:16px;margin-bottom:20px;"><div style="font-size:13px;font-weight:600;color:#1a4fc4;margin-bottom:8px;">📚 What to study next</div><div style="font-size:13px;color:#374151;line-height:1.6;" id="ss-study-plan">—</div></div>
+      <div style="margin-bottom:20px;"><div class="section-label">Question by question</div><div id="ss-questions"></div></div>
+      <button class="btn" style="width:100%;font-size:15px;" onclick="closeSessionSummary()">Continue Practicing</button>
+    </div>
+  </div>
 
-    let topic = 'dsa';
-    let currentQ = '';
-    let practiceMode = 1;
-    let isRec = false;
-    let recog = null;
-    let chart = null;
-    let camStream = null;
-    let camInterval = null;
-    let dailyChartInstance = null;
-    let weeklyChartInstance = null;
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = 'http://localhost:8000';
+    const userId = localStorage.getItem('user_id');
+    if (!userId) window.location.href = 'index.html';
+
+    let topic = 'dsa', currentQ = '', practiceMode = 1, isRec = false, recog = null, chart = null;
+    let camStream = null, camInterval = null, dailyChartInstance = null, weeklyChartInstance = null;
     let sessionAttempts = [];
     const SESSION_TARGET = 5;
 
-    const tips = {
-      dsa: 'Practice DSA — always mention time and space complexity.',
-      hr: 'Practice HR — use the STAR format for every answer.',
-      os: 'Revise OS — focus on processes, scheduling, and memory.',
-      cn: 'Revise CN — cover OSI model, TCP/UDP, and DNS.',
-      system_design: 'Practice System Design — always mention scale and database choice.'
-    };
+    const tips = { dsa: 'Practice DSA — always mention time and space complexity.', hr: 'Practice HR — use the STAR format for every answer.', os: 'Revise OS — focus on processes, scheduling, and memory.', cn: 'Revise CN — cover OSI model, TCP/UDP, and DNS.', system_design: 'Practice System Design — always mention scale and database choice.' };
+    const liveKeywords = { dsa: ['time complexity','space complexity','o(','example','algorithm','array','node','pointer','recursion','base case','sorted','pivot','hash','collision','queue','stack','graph','tree','dynamic'], hr: ['example','situation','action','result','team','project','learned','improved','achieved','strength','goal','motivated','leadership'], os: ['process','thread','memory','deadlock','scheduling','semaphore','mutex','paging','virtual','context switch','prevention','kernel'], cn: ['protocol','tcp','udp','http','dns','osi','layer','connection','handshake','ip','router','switch','packet','reliable'], system_design: ['scale','database','cache','api','availability','load','queue','storage','latency','redis','microservice','cdn'] };
 
-    const liveKeywords = {
-      dsa: ['time complexity','space complexity','o(','example','algorithm','array','node','pointer','recursion','base case','sorted','pivot','hash','collision','queue','stack','graph','tree','dynamic'],
-      hr:  ['example','situation','action','result','team','project','learned','improved','achieved','strength','goal','motivated','leadership'],
-      os:  ['process','thread','memory','deadlock','scheduling','semaphore','mutex','paging','virtual','context switch','prevention','kernel'],
-      cn:  ['protocol','tcp','udp','http','dns','osi','layer','connection','handshake','ip','router','switch','packet','reliable'],
-      system_design: ['scale','database','cache','api','availability','load','queue','storage','latency','redis','microservice','cdn']
-    };
+    function showToast(msg, duration=3000) { const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none', duration); }
 
-    // ── Weekly progress ───────────────────────────────────
-    function switchView(view) {
-      document.getElementById('daily-view').style.display = view === 'daily' ? 'block' : 'none';
-      document.getElementById('weekly-view').style.display = view === 'weekly' ? 'block' : 'none';
-      document.getElementById('view-daily').classList.toggle('active', view === 'daily');
-      document.getElementById('view-weekly').classList.toggle('active', view === 'weekly');
-    }
+    function switchView(v) { document.getElementById('daily-view').style.display=v==='daily'?'block':'none'; document.getElementById('weekly-view').style.display=v==='weekly'?'block':'none'; document.getElementById('view-daily').classList.toggle('active',v==='daily'); document.getElementById('view-weekly').classList.toggle('active',v==='weekly'); }
 
     async function loadWeeklyProgress() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/weekly-progress/' + userId);
+        const res = await fetch(API + '/weekly-progress/' + userId);
         if (!res.ok) return;
         const data = await res.json();
         document.getElementById('days-active').textContent = data.total_days_active || 0;
         document.getElementById('streak-count').textContent = data.current_streak || 0;
-        if (data.best_day && data.best_day.count > 0)
-          document.getElementById('best-day-text').textContent = data.best_day.date + ' (' + data.best_day.count + ' sessions)';
-        if (data.best_week && data.best_week.avg_score > 0)
-          document.getElementById('best-week-score').textContent = data.best_week.avg_score + '/10';
+        if (data.best_day && data.best_day.count > 0) document.getElementById('best-day-text').textContent = data.best_day.date + ' (' + data.best_day.count + ')';
+        if (data.best_week && data.best_week.avg_score > 0) document.getElementById('best-week-score').textContent = data.best_week.avg_score + '/10';
         const daily = data.daily || [];
         if (dailyChartInstance) dailyChartInstance.destroy();
-        dailyChartInstance = new Chart(document.getElementById('dailyChart'), {
-          type: 'bar',
-          data: { labels: daily.map(d => d.date), datasets: [{ label: 'Sessions', data: daily.map(d => d.count), backgroundColor: daily.map(d => d.count >= 3 ? '#534AB7' : d.count >= 1 ? '#AFA9EC' : '#f0f0f0'), borderRadius: 4 }] },
-          options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { font:{size:9}, color:'#999', maxRotation:45 }, grid: { display:false } }, y: { min:0, ticks: { font:{size:11}, color:'#999', stepSize:1 }, grid: { color:'#f5f5f5' } } } }
-        });
+        dailyChartInstance = new Chart(document.getElementById('dailyChart'), { type:'bar', data:{ labels:daily.map(d=>d.date), datasets:[{ label:'Sessions', data:daily.map(d=>d.count), backgroundColor:daily.map(d=>d.count>=3?'#1a4fc4':d.count>=1?'#93aee8':'#e2e8f0'), borderRadius:4 }]}, options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},color:'#94a3b8',maxRotation:45},grid:{display:false}},y:{min:0,ticks:{font:{size:11},color:'#94a3b8',stepSize:1},grid:{color:'#f1f4fb'}}}}});
         const weeks = data.weeks || [];
         if (weeklyChartInstance) weeklyChartInstance.destroy();
-        weeklyChartInstance = new Chart(document.getElementById('weeklyChart'), {
-          type: 'line',
-          data: { labels: weeks.map(w => w.week), datasets: [
-            { label: 'Avg score', data: weeks.map(w => w.avg_score), borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#534AB7', tension: 0.4, fill: true, yAxisID: 'y' },
-            { label: 'Sessions', data: weeks.map(w => w.count), borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#1D9E75', tension: 0.4, fill: false, yAxisID: 'y1' }
-          ]},
-          options: { responsive: true, plugins: { legend: { display: true, position: 'top', labels: { font:{size:11}, boxWidth:12 } } }, scales: { x: { ticks: { font:{size:11}, color:'#999' }, grid: { color:'#f5f5f5' } }, y: { min:0, max:10, ticks: { font:{size:11}, color:'#999', stepSize:2 }, grid: { color:'#f5f5f5' }, title: { display:true, text:'Avg Score', font:{size:10}, color:'#999' } }, y1: { position:'right', min:0, ticks: { font:{size:11}, color:'#1D9E75', stepSize:1 }, grid: { display:false }, title: { display:true, text:'Sessions', font:{size:10}, color:'#1D9E75' } } } }
-        });
+        weeklyChartInstance = new Chart(document.getElementById('weeklyChart'), { type:'line', data:{ labels:weeks.map(w=>w.week), datasets:[{ label:'Avg score', data:weeks.map(w=>w.avg_score), borderColor:'#1a4fc4', backgroundColor:'rgba(26,79,196,0.08)', borderWidth:2, pointRadius:4, pointBackgroundColor:'#1a4fc4', tension:0.4, fill:true, yAxisID:'y'}, { label:'Sessions', data:weeks.map(w=>w.count), borderColor:'#0d9e6e', backgroundColor:'rgba(13,158,110,0.08)', borderWidth:2, pointRadius:3, pointBackgroundColor:'#0d9e6e', tension:0.4, fill:false, yAxisID:'y1'}]}, options:{responsive:true,plugins:{legend:{display:true,position:'top',labels:{font:{size:11},boxWidth:12}}},scales:{x:{ticks:{font:{size:11},color:'#94a3b8'},grid:{color:'#f1f4fb'}},y:{min:0,max:10,ticks:{font:{size:11},color:'#94a3b8',stepSize:2},grid:{color:'#f1f4fb'}},y1:{position:'right',min:0,ticks:{font:{size:11},color:'#0d9e6e',stepSize:1},grid:{display:false}}}}});
         const allModes = {};
-        weeks.forEach(w => { Object.entries(w.modes || {}).forEach(([mode, count]) => { allModes[mode] = (allModes[mode] || 0) + count; }); });
-        const modeColors = { dsa:'#534AB7', hr:'#1D9E75', os:'#EF9F27', cn:'#E24B4A', system_design:'#0F6E56' };
-        document.getElementById('topic-breakdown').innerHTML = Object.keys(allModes).length > 0
-          ? Object.entries(allModes).map(([mode, count]) => '<div style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #eee;border-radius:20px;padding:5px 12px;font-size:12px;"><div style="width:8px;height:8px;border-radius:50%;background:' + (modeColors[mode]||'#534AB7') + ';flex-shrink:0;"></div><span style="font-weight:600;">' + mode.toUpperCase() + '</span><span style="color:#999;">' + count + ' sessions</span></div>').join('')
-          : '<div style="color:#bbb;font-size:13px;">No data yet</div>';
+        weeks.forEach(w => { Object.entries(w.modes||{}).forEach(([mode,count]) => { allModes[mode]=(allModes[mode]||0)+count; }); });
+        const modeColors = {dsa:'#1a4fc4',hr:'#0d9e6e',os:'#d97706',cn:'#e24b4a',system_design:'#0f6e56'};
+        document.getElementById('topic-breakdown').innerHTML = Object.keys(allModes).length > 0 ? Object.entries(allModes).map(([mode,count]) => '<div style="display:flex;align-items:center;gap:6px;background:#fff;border:0.5px solid #e2e8f0;border-radius:20px;padding:5px 12px;font-size:12px;"><div style="width:7px;height:7px;border-radius:50%;background:'+(modeColors[mode]||'#1a4fc4')+';flex-shrink:0;"></div><span style="font-weight:600;">'+mode.toUpperCase()+'</span><span style="color:#94a3b8;margin-left:4px;">'+count+'</span></div>').join('') : '<div style="color:#cbd5e1;font-size:13px;">No data yet</div>';
       } catch(e) { console.log('Weekly progress error:', e); }
     }
 
-    // ── Session summary ───────────────────────────────────
-    function trackSessionAttempt(question, score, mode) {
-      sessionAttempts.push({question, score, mode});
-      if (sessionAttempts.length >= SESSION_TARGET) {
-        setTimeout(() => showSessionSummary(), 1000);
-      }
-    }
+    function trackSessionAttempt(question, score, mode) { sessionAttempts.push({question,score,mode}); if (sessionAttempts.length >= SESSION_TARGET) setTimeout(() => showSessionSummary(), 1000); }
 
     async function showSessionSummary() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/session-summary', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({user_id: parseInt(userId), attempts: sessionAttempts})
-        });
+        const res = await fetch(API + '/session-summary', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id:parseInt(userId),attempts:sessionAttempts}) });
         const data = await res.json();
         renderSessionSummary(data);
         document.getElementById('session-modal').style.display = 'block';
@@ -433,11 +314,9 @@
     }
 
     function renderSessionSummary(data) {
-      const color = data.color === 'green' ? '#1D9E75' : data.color === 'red' ? '#E24B4A' : '#EF9F27';
-      document.getElementById('ss-avg').textContent = data.avg_score;
-      document.getElementById('ss-avg').style.color = color;
-      document.getElementById('ss-verdict').textContent = data.overall;
-      document.getElementById('ss-verdict').style.color = color;
+      const color = data.color==='green'?'#0d9e6e':data.color==='red'?'#e24b4a':'#d97706';
+      document.getElementById('ss-avg').textContent = data.avg_score; document.getElementById('ss-avg').style.color = color;
+      document.getElementById('ss-verdict').textContent = data.overall; document.getElementById('ss-verdict').style.color = color;
       document.getElementById('ss-msg').textContent = data.overall_msg;
       document.getElementById('ss-total').textContent = data.total_questions;
       document.getElementById('ss-best').textContent = data.best_score;
@@ -446,342 +325,113 @@
       document.getElementById('ss-weakest').textContent = (data.weakest||'—').toUpperCase();
       document.getElementById('ss-study-plan').textContent = data.next_focus;
       const dist = data.score_distribution || {};
-      document.getElementById('ss-distribution').innerHTML = [
-        ['Excellent (8-10)', dist.excellent||0, '#1D9E75'],
-        ['Good (6-7)', dist.good||0, '#534AB7'],
-        ['Average (4-5)', dist.average||0, '#EF9F27'],
-        ['Weak (0-3)', dist.weak||0, '#E24B4A']
-      ].map(([label, count, c]) =>
-        '<div class="bar-row" style="margin-bottom:8px;"><span style="width:120px;font-size:12px;color:#666;">' + label + '</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.round((count / data.total_questions) * 100) + '%;background:' + c + ';"></div></div><span style="font-size:12px;font-weight:600;margin-left:8px;color:' + c + ';">' + count + '</span></div>'
-      ).join('');
-      const modeColors = {dsa:'#534AB7',hr:'#1D9E75',os:'#EF9F27',cn:'#E24B4A',system_design:'#0F6E56'};
-      document.getElementById('ss-topics').innerHTML = Object.entries(data.mode_avg || {}).map(([mode, avg]) =>
-        '<div class="bar-row" style="margin-bottom:8px;"><span class="bar-label" style="width:110px;">' + mode.toUpperCase() + '</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.min(100,avg*10) + '%;background:' + (modeColors[mode]||'#534AB7') + ';"></div></div><span class="bar-val">' + avg + '/10</span></div>'
-      ).join('');
-      document.getElementById('ss-questions').innerHTML = (data.attempts || []).map((a, i) => {
-        const c = a.score >= 7 ? '#1D9E75' : a.score >= 4 ? '#EF9F27' : '#E24B4A';
-        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f9f9f9;border-radius:8px;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;color:#999;flex-shrink:0;">Q' + (i+1) + '</span><span style="flex:1;font-size:12px;color:#444;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">' + a.question + '</span><span style="font-size:13px;font-weight:700;color:' + c + ';flex-shrink:0;">' + a.score + '/10</span></div>';
-      }).join('');
+      document.getElementById('ss-distribution').innerHTML = [['Excellent (8-10)',dist.excellent||0,'#0d9e6e'],['Good (6-7)',dist.good||0,'#1a4fc4'],['Average (4-5)',dist.average||0,'#d97706'],['Weak (0-3)',dist.weak||0,'#e24b4a']].map(([label,count,c]) => '<div class="bar-row" style="margin-bottom:8px;"><span style="width:120px;font-size:12px;color:#64748b;">'+label+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((count/Math.max(data.total_questions,1))*100)+'%;background:'+c+';"></div></div><span style="font-size:12px;font-weight:600;margin-left:8px;color:'+c+';">'+count+'</span></div>').join('');
+      const modeColors = {dsa:'#1a4fc4',hr:'#0d9e6e',os:'#d97706',cn:'#e24b4a',system_design:'#0f6e56'};
+      document.getElementById('ss-topics').innerHTML = Object.entries(data.mode_avg||{}).map(([mode,avg]) => '<div class="bar-row" style="margin-bottom:8px;"><span class="bar-label" style="width:110px;">'+mode.toUpperCase()+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,avg*10)+'%;background:'+(modeColors[mode]||'#1a4fc4')+';"></div></div><span class="bar-val">'+avg+'/10</span></div>').join('');
+      document.getElementById('ss-questions').innerHTML = (data.attempts||[]).map((a,i) => { const c=a.score>=7?'#0d9e6e':a.score>=4?'#d97706':'#e24b4a'; return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f8fafc;border-radius:8px;margin-bottom:6px;border:0.5px solid #e2e8f0;"><span style="font-size:12px;font-weight:700;color:#94a3b8;flex-shrink:0;">Q'+(i+1)+'</span><span style="flex:1;font-size:12px;color:#374151;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+a.question+'</span><span style="font-size:13px;font-weight:700;color:'+c+';flex-shrink:0;">'+a.score+'/10</span></div>'; }).join('');
     }
 
-    function closeSessionSummary() {
-      document.getElementById('session-modal').style.display = 'none';
-    }
+    function closeSessionSummary() { document.getElementById('session-modal').style.display = 'none'; }
 
-    // ── Practice mode ─────────────────────────────────────
-    function setPracticeMode(m) {
-      practiceMode = m;
-      [1,2,3].forEach(i => { document.getElementById('mode-btn-' + i).classList.remove('active'); document.getElementById('mode' + i + '-section').style.display = 'none'; });
-      document.getElementById('mode-btn-' + m).classList.add('active');
-      document.getElementById('mode' + m + '-section').style.display = 'block';
-      document.getElementById('result-box').style.display = 'none';
-    }
+    function setPracticeMode(m) { practiceMode=m; [1,2,3].forEach(i=>{document.getElementById('mode-btn-'+i).classList.remove('active');document.getElementById('mode'+i+'-section').style.display='none';}); document.getElementById('mode-btn-'+m).classList.add('active'); document.getElementById('mode'+m+'-section').style.display='block'; document.getElementById('result-box').style.display='none'; }
 
-    function setTopic(t, btn) {
-      topic = t;
-      document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('camera-section').style.display = t === 'hr' ? 'block' : 'none';
-      if (t !== 'hr') stopCamera();
-    }
+    function setTopic(t, btn) { topic=t; document.querySelectorAll('.topic-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('camera-section').style.display=t==='hr'?'block':'none'; if(t!=='hr') stopCamera(); }
 
-    // ── Camera ────────────────────────────────────────────
-    async function startCamera() {
-      try {
-        camStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
-        document.getElementById('cam-feed').srcObject = camStream;
-        document.getElementById('cam-status').textContent = '🟢 Camera active — analysing...';
-        document.getElementById('cam-status').style.color = '#1D9E75';
-        camInterval = setInterval(analyseCameraFrame, 1000);
-      } catch(e) { document.getElementById('cam-status').textContent = '❌ Camera access denied.'; document.getElementById('cam-status').style.color = '#E24B4A'; }
-    }
+    async function startCamera() { try { camStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false}); document.getElementById('cam-feed').srcObject=camStream; document.getElementById('cam-status').textContent='🟢 Camera active — analysing...'; document.getElementById('cam-status').style.color='#0d9e6e'; camInterval=setInterval(analyseCameraFrame,800); } catch(e) { document.getElementById('cam-status').textContent='❌ Camera access denied.'; document.getElementById('cam-status').style.color='#e24b4a'; } }
 
-    function stopCamera() {
-      if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
-      if (camInterval) { clearInterval(camInterval); camInterval = null; }
-      const feed = document.getElementById('cam-feed');
-      if (feed) feed.srcObject = null;
-      const status = document.getElementById('cam-status');
-      if (status) { status.textContent = 'Camera stopped.'; status.style.color = '#999'; }
-    }
+    function stopCamera() { if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} if(camInterval){clearInterval(camInterval);camInterval=null;} const feed=document.getElementById('cam-feed'); if(feed) feed.srcObject=null; const status=document.getElementById('cam-status'); if(status){status.textContent='Camera stopped.';status.style.color='#94a3b8';} }
 
     function analyseCameraFrame() {
-      const video = document.getElementById('cam-feed');
-      const canvas = document.getElementById('cam-canvas');
-      if (!video || !camStream) return;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, 200, 150);
-      const frame = ctx.getImageData(0, 0, 200, 150);
-      const data = frame.data;
-      let brightness = 0;
-      for (let i = 0; i < data.length; i += 4) brightness += (data[i] + data[i+1] + data[i+2]) / 3;
-      brightness = brightness / (data.length / 4);
-      const lightPct = Math.min(100, Math.round((brightness / 255) * 180));
-      let centreBrightness = 0, centreCount = 0;
-      for (let y = 30; y < 120; y++) for (let x = 60; x < 140; x++) { const idx = (y*200+x)*4; centreBrightness += (data[idx]+data[idx+1]+data[idx+2])/3; centreCount++; }
-      centreBrightness = centreBrightness / centreCount;
-      const faceInCentre = centreBrightness > 60 && centreBrightness < 220;
-      const eyePct = faceInCentre ? Math.min(100, Math.round(centreBrightness / 2)) : 20;
-      let upperB = 0, lowerB = 0;
-      for (let y = 0; y < 75; y++) for (let x = 0; x < 200; x++) { const idx = (y*200+x)*4; upperB += (data[idx]+data[idx+1]+data[idx+2])/3; }
-      for (let y = 75; y < 150; y++) for (let x = 0; x < 200; x++) { const idx = (y*200+x)*4; lowerB += (data[idx]+data[idx+1]+data[idx+2])/3; }
-      const postureGood = upperB > lowerB * 0.8;
-      const posturePct = postureGood ? Math.min(100, Math.round(eyePct * 0.9)) : 35;
-      document.getElementById('cam-eye').style.width = eyePct + '%';
-      document.getElementById('cam-eye-val').textContent = eyePct + '%';
-      document.getElementById('cam-posture').style.width = posturePct + '%';
-      document.getElementById('cam-posture-val').textContent = posturePct + '%';
-      document.getElementById('cam-light').style.width = lightPct + '%';
-      document.getElementById('cam-light-val').textContent = lightPct + '%';
-      let tip = '';
-      if (brightness < 60) tip = '💡 Too dark — move to a brighter area.';
-      else if (brightness > 200) tip = '☀️ Too bright — reduce backlight.';
-      else if (!faceInCentre) tip = '📷 Centre yourself in the frame.';
-      else if (!postureGood) tip = '🧍 Sit up straight — shoulders level.';
-      else if (eyePct < 50) tip = '👁 Look at the camera, not your screen.';
-      else tip = '✅ Looking good! Maintain this posture.';
-      document.getElementById('cam-tip').textContent = tip;
+      const video=document.getElementById('cam-feed'); const canvas=document.getElementById('cam-canvas');
+      if(!video||!camStream) return;
+      const ctx=canvas.getContext('2d'); ctx.drawImage(video,0,0,200,150);
+      const frame=ctx.getImageData(0,0,200,150); const data=frame.data;
+      let brightness=0; for(let i=0;i<data.length;i+=4) brightness+=(data[i]+data[i+1]+data[i+2])/3; brightness=brightness/(data.length/4);
+      const lightPct=Math.min(100,Math.round((brightness/255)*180));
+      let centreBrightness=0,centreCount=0; for(let y=30;y<120;y++) for(let x=60;x<140;x++){const idx=(y*200+x)*4;centreBrightness+=(data[idx]+data[idx+1]+data[idx+2])/3;centreCount++;} centreBrightness=centreBrightness/centreCount;
+      const faceInCentre=centreBrightness>60&&centreBrightness<220;
+      const eyePct=faceInCentre?Math.min(100,Math.round(centreBrightness/2)):20;
+      let upperB=0,lowerB=0; for(let y=0;y<75;y++) for(let x=0;x<200;x++){const idx=(y*200+x)*4;upperB+=(data[idx]+data[idx+1]+data[idx+2])/3;} for(let y=75;y<150;y++) for(let x=0;x<200;x++){const idx=(y*200+x)*4;lowerB+=(data[idx]+data[idx+1]+data[idx+2])/3;}
+      const postureGood=upperB>lowerB*0.8; const posturePct=postureGood?Math.min(100,Math.round(eyePct*0.9)):35;
+      const focusPct=faceInCentre?Math.min(100,Math.round((centreBrightness/220)*100)):30;
+      document.getElementById('cam-eye').style.width=eyePct+'%'; document.getElementById('cam-eye-val').textContent=eyePct+'%';
+      document.getElementById('cam-posture').style.width=posturePct+'%'; document.getElementById('cam-posture-val').textContent=posturePct+'%';
+      document.getElementById('cam-light').style.width=lightPct+'%'; document.getElementById('cam-light-val').textContent=lightPct+'%';
+      document.getElementById('cam-focus').style.width=focusPct+'%'; document.getElementById('cam-focus-val').textContent=focusPct+'%';
+      let tip=''; if(brightness<60) tip='💡 Too dark — move to a brighter area.'; else if(brightness>200) tip='☀️ Too bright — reduce backlight.'; else if(!faceInCentre) tip='📷 Centre yourself in the frame.'; else if(!postureGood) tip='🧍 Sit up straight — shoulders level.'; else if(eyePct<50) tip='👁 Look at the camera, not your screen.'; else tip='✅ Looking good! Maintain this posture.';
+      document.getElementById('cam-tip').textContent=tip;
     }
 
-    // ── Mode 2 ────────────────────────────────────────────
-    async function getModelAnswer() {
-      const q = document.getElementById('model-q-input').value.trim();
-      if (!q) { alert('Type a question first'); return; }
-      const box = document.getElementById('model-answer-box');
-      const pts = document.getElementById('model-key-points');
-      box.style.display = 'block';
-      box.textContent = 'Generating model answer...';
-      pts.style.display = 'none';
-      try {
-        const res = await fetch('http://127.0.0.1:8000/model-answer', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({question: q, mode: topic}) });
-        const data = await res.json();
-        box.textContent = data.model_answer || 'No answer available.';
-        if (data.key_points && data.key_points.length > 0) {
-          pts.style.display = 'block';
-          pts.innerHTML = '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#1a1a2e;">🔑 Key points to cover:</div>' + data.key_points.map(p => '<div style="font-size:12px;color:#444;padding:5px 10px;background:#f5f4ff;border-radius:6px;margin-bottom:4px;">• ' + p + '</div>').join('');
-        }
-      } catch(e) { box.textContent = 'Could not fetch model answer. Check backend.'; }
-    }
+    async function getModelAnswer() { const q=document.getElementById('model-q-input').value.trim(); if(!q){showToast('Type a question first');return;} const box=document.getElementById('model-answer-box'); const pts=document.getElementById('model-key-points'); box.style.display='block'; box.textContent='Generating...'; pts.style.display='none'; try { const res=await fetch(API+'/model-answer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,mode:topic})}); const data=await res.json(); box.textContent=data.model_answer||'No answer available.'; if(data.key_points&&data.key_points.length>0){pts.style.display='block';pts.innerHTML='<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#0f172a;">🔑 Key points:</div>'+data.key_points.map(p=>'<div style="font-size:12px;color:#374151;padding:5px 10px;background:#eff0fe;border-radius:6px;margin-bottom:4px;">• '+p+'</div>').join('');} } catch(e){box.textContent='Could not fetch model answer.';} }
 
-    // ── Mode 3 ────────────────────────────────────────────
-    function liveCompare() {
-      const ans = document.getElementById('compare-ans').value.toLowerCase();
-      const liveDiv = document.getElementById('compare-live');
-      if (ans.trim().length < 5) { liveDiv.style.display = 'none'; return; }
-      liveDiv.style.display = 'block';
-      const keys = liveKeywords[topic] || liveKeywords['dsa'];
-      const matched = keys.filter(k => ans.includes(k));
-      const matchPct = Math.round((matched.length / keys.length) * 100);
-      const missPct = 100 - matchPct;
-      document.getElementById('cmp-match').style.width = matchPct + '%';
-      document.getElementById('cmp-match-val').textContent = matchPct + '%';
-      document.getElementById('cmp-miss').style.width = missPct + '%';
-      document.getElementById('cmp-miss-val').textContent = missPct + '%';
-      const missing = keys.filter(k => !ans.includes(k));
-      document.getElementById('cmp-live-hint').innerHTML = missing.length > 0 ? '💡 Missing: <strong>' + missing.slice(0,3).join(', ') + '</strong>' : '✅ Good coverage!';
-    }
+    function liveCompare() { const ans=document.getElementById('compare-ans').value.toLowerCase(); const liveDiv=document.getElementById('compare-live'); if(ans.trim().length<5){liveDiv.style.display='none';return;} liveDiv.style.display='block'; const keys=liveKeywords[topic]||liveKeywords['dsa']; const matched=keys.filter(k=>ans.includes(k)); const matchPct=Math.round((matched.length/keys.length)*100); const missPct=100-matchPct; document.getElementById('cmp-match').style.width=matchPct+'%'; document.getElementById('cmp-match-val').textContent=matchPct+'%'; document.getElementById('cmp-miss').style.width=missPct+'%'; document.getElementById('cmp-miss-val').textContent=missPct+'%'; const missing=keys.filter(k=>!ans.includes(k)); document.getElementById('cmp-live-hint').innerHTML=missing.length>0?'💡 Missing: <strong>'+missing.slice(0,3).join(', ')+'</strong>':'✅ Good coverage!'; }
 
-    async function compareAnswers() {
-      const q = document.getElementById('compare-q').value.trim();
-      const ans = document.getElementById('compare-ans').value.trim();
-      if (!q) { alert('Type your question first'); return; }
-      if (!ans) { alert('Type your answer first'); return; }
-      const resultDiv = document.getElementById('compare-result');
-      resultDiv.style.display = 'block';
-      resultDiv.innerHTML = '<div style="color:#999;font-size:13px;">Comparing your answer...</div>';
-      try {
-        const res = await fetch('http://127.0.0.1:8000/compare', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({question: q, user_answer: ans, mode: topic}) });
-        const data = await res.json();
-        const matchPct = data.match_pct ?? 0;
-        const missPct = data.missing_pct ?? 0;
-        const extraPct = data.extra_pct ?? 0;
-        resultDiv.innerHTML =
-          '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:#1a1a2e;">Comparison Result</div>' +
-          '<div style="background:#f9f9f9;border-radius:10px;padding:14px;margin-bottom:14px;">' +
-          '<div class="bar-row"><span class="bar-label" style="width:130px;font-size:12px;">✅ Matching</span><div class="bar-track"><div class="bar-fill" style="width:' + matchPct + '%;background:#1D9E75;"></div></div><span class="bar-val green">' + matchPct + '%</span></div>' +
-          '<div class="bar-row"><span class="bar-label" style="width:130px;font-size:12px;">❌ Missing</span><div class="bar-track"><div class="bar-fill" style="width:' + missPct + '%;background:#E24B4A;"></div></div><span class="bar-val red">' + missPct + '%</span></div>' +
-          '<div class="bar-row"><span class="bar-label" style="width:130px;font-size:12px;">➕ Extra added</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.min(100,extraPct) + '%;background:#534AB7;"></div></div><span class="bar-val purple">' + extraPct + '%</span></div></div>' +
-          '<div class="feedback-card" style="margin-bottom:12px;">' +
-          '<div style="margin-bottom:6px;"><strong>✅ What was correct:</strong> ' + (data.what_correct||'—') + '</div>' +
-          '<div style="margin-bottom:6px;"><strong>❌ What was missing:</strong> ' + (data.what_missing||'—') + '</div>' +
-          '<div style="margin-bottom:6px;"><strong>📈 What to add:</strong> ' + (data.what_to_add||'—') + '</div>' +
-          '<div><strong>🎯 Overall verdict:</strong> <span style="color:#534AB7;font-weight:600;">' + (data.verdict||'—') + '</span></div></div>' +
-          '<details><summary>See ideal answer</summary><div style="margin-top:10px;font-size:13px;line-height:1.7;color:#444;background:#f9f9f9;padding:14px;border-radius:8px;">' + (data.ideal_answer||'') + '</div></details>';
-      } catch(e) { resultDiv.innerHTML = '<div style="color:#E24B4A;font-size:13px;">Error comparing. Check backend.</div>'; }
-    }
+    async function compareAnswers() { const q=document.getElementById('compare-q').value.trim(); const ans=document.getElementById('compare-ans').value.trim(); if(!q||!ans){showToast('Fill both fields');return;} const resultDiv=document.getElementById('compare-result'); resultDiv.style.display='block'; resultDiv.innerHTML='<div style="color:#94a3b8;font-size:13px;">Comparing...</div>'; try { const res=await fetch(API+'/compare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,user_answer:ans,mode:topic})}); const data=await res.json(); const matchPct=data.match_pct??0,missPct=data.missing_pct??0,extraPct=data.extra_pct??0; resultDiv.innerHTML='<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:#0f172a;">Comparison Result</div><div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:14px;border:0.5px solid #e2e8f0;"><div class="bar-row"><span class="bar-label" style="width:130px;font-size:12px;">✅ Matching</span><div class="bar-track"><div class="bar-fill" style="width:'+matchPct+'%;background:#0d9e6e;"></div></div><span class="bar-val green">'+matchPct+'%</span></div><div class="bar-row"><span class="bar-label" style="width:130px;font-size:12px;">❌ Missing</span><div class="bar-track"><div class="bar-fill" style="width:'+missPct+'%;background:#e24b4a;"></div></div><span class="bar-val red">'+missPct+'%</span></div><div class="bar-row"><span class="bar-label" style="width:130px;font-size:12px;">➕ Extra</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,extraPct)+'%;background:#1a4fc4;"></div></div><span class="bar-val purple">'+extraPct+'%</span></div></div><div class="feedback-card" style="margin-bottom:12px;"><div style="margin-bottom:6px;"><strong>✅ Correct:</strong> '+(data.what_correct||'—')+'</div><div style="margin-bottom:6px;"><strong>❌ Missing:</strong> '+(data.what_missing||'—')+'</div><div style="margin-bottom:6px;"><strong>📈 Add:</strong> '+(data.what_to_add||'—')+'</div><div><strong>🎯 Verdict:</strong> <span style="color:#1a4fc4;font-weight:600;">'+(data.verdict||'—')+'</span></div></div><details><summary>See ideal answer</summary><div style="margin-top:10px;font-size:13px;line-height:1.7;color:#374151;background:#f8fafc;padding:14px;border-radius:8px;">'+(data.ideal_answer||'')+'</div></details>'; } catch(e){resultDiv.innerHTML='<div style="color:#e24b4a;font-size:13px;">Error. Check backend.</div>';} }
 
-    // ── Live analysis ─────────────────────────────────────
-    function liveAnalyse() {
-      const answer = document.getElementById('answer').value.toLowerCase();
-      const panel = document.getElementById('live-panel');
-      if (answer.trim().length < 3) { panel.style.display = 'none'; return; }
-      panel.style.display = 'block';
-      const words = answer.trim().split(/\s+/).length;
-      const keys = liveKeywords[topic] || liveKeywords['dsa'];
-      const covered = keys.filter(k => answer.includes(k));
-      const coveredPct = Math.round((covered.length / keys.length) * 100);
-      const missingPct = 100 - coveredPct;
-      document.getElementById('live-correct').style.width = coveredPct + '%';
-      document.getElementById('live-correct-val').textContent = coveredPct + '%';
-      document.getElementById('live-missing').style.width = missingPct + '%';
-      document.getElementById('live-missing-val').textContent = missingPct + '%';
-      let wordMsg = '', wordColor = '#999';
-      if (words < 20) { wordMsg = words + ' words — too short'; wordColor = '#E24B4A'; }
-      else if (words < 50) { wordMsg = words + ' words — getting there'; wordColor = '#EF9F27'; }
-      else if (words < 100) { wordMsg = words + ' words — good length'; wordColor = '#1D9E75'; }
-      else { wordMsg = words + ' words — excellent'; wordColor = '#1D9E75'; }
-      document.getElementById('live-words').innerHTML = '<span style="color:' + wordColor + ';font-weight:600;">' + wordMsg + '</span>';
-      const missing = keys.filter(k => !answer.includes(k));
-      document.getElementById('live-hint').innerHTML = missing.length > 0 && words > 10 ? '💡 Try to mention: <strong>' + missing.slice(0,3).join(', ') + '</strong>' : coveredPct >= 70 ? '✅ Great coverage! Ready to submit.' : '';
-    }
+    function liveAnalyse() { const answer=document.getElementById('answer').value.toLowerCase(); const panel=document.getElementById('live-panel'); if(answer.trim().length<3){panel.style.display='none';return;} panel.style.display='block'; const words=answer.trim().split(/\s+/).length; const keys=liveKeywords[topic]||liveKeywords['dsa']; const covered=keys.filter(k=>answer.includes(k)); const coveredPct=Math.round((covered.length/keys.length)*100); const missingPct=100-coveredPct; document.getElementById('live-correct').style.width=coveredPct+'%'; document.getElementById('live-correct-val').textContent=coveredPct+'%'; document.getElementById('live-missing').style.width=missingPct+'%'; document.getElementById('live-missing-val').textContent=missingPct+'%'; let wordMsg='',wordColor='#94a3b8'; if(words<20){wordMsg=words+' words — too short';wordColor='#e24b4a';}else if(words<50){wordMsg=words+' words — getting there';wordColor='#d97706';}else if(words<100){wordMsg=words+' words — good length';wordColor='#0d9e6e';}else{wordMsg=words+' words — excellent';wordColor='#0d9e6e';} document.getElementById('live-words').innerHTML='<span style="color:'+wordColor+';font-weight:600;">'+wordMsg+'</span>'; const missing=keys.filter(k=>!answer.includes(k)); document.getElementById('live-hint').innerHTML=missing.length>0&&words>10?'💡 Try to mention: <strong>'+missing.slice(0,3).join(', ')+'</strong>':coveredPct>=70?'✅ Great coverage! Ready to submit.':''; }
 
-    // ── Core ──────────────────────────────────────────────
-    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+    function logout() { localStorage.clear(); window.location.href='index.html'; }
 
-    function showQ(q) {
-      currentQ = q;
-      document.getElementById('q-box').textContent = 'Q: ' + q;
-      document.getElementById('q-box').style.display = 'block';
-      document.getElementById('answer').style.display = 'block';
-      document.getElementById('answer').value = '';
-      document.getElementById('live-panel').style.display = 'none';
-      document.getElementById('actions').style.display = 'flex';
-      document.getElementById('result-box').style.display = 'none';
-    }
+    function showQ(q) { currentQ=q; document.getElementById('q-box').textContent='Q: '+q; document.getElementById('q-box').style.display='block'; document.getElementById('answer').style.display='block'; document.getElementById('answer').value=''; document.getElementById('live-panel').style.display='none'; document.getElementById('actions').style.display='flex'; document.getElementById('result-box').style.display='none'; }
 
     async function getQuestion() {
-      try {
-        const res = await fetch('http://127.0.0.1:8000/question/' + topic);
-        const data = await res.json();
-        showQ(data.question);
-      } catch(e) { alert('Backend not running. Start uvicorn first.'); }
+      const btn = document.querySelector('#mode1-section .btn');
+      if(btn){btn.textContent='Loading...';btn.disabled=true;}
+      try { const res=await fetch(API+'/question/'+topic); if(!res.ok) throw new Error('Server error'); const data=await res.json(); showQ(data.question); }
+      catch(e){showToast('❌ Cannot reach backend. Is uvicorn running on port 8000?');}
+      finally{if(btn){btn.textContent='Get Random Question';btn.disabled=false;}}
     }
 
-    function askCustom() {
-      const q = document.getElementById('custom-q').value.trim();
-      if (!q) { alert('Type a question first'); return; }
-      document.getElementById('custom-q').value = '';
-      showQ(q);
-    }
+    function askCustom() { const q=document.getElementById('custom-q').value.trim(); if(!q){showToast('Type a question first');return;} document.getElementById('custom-q').value=''; showQ(q); }
 
     async function submitAnswer() {
-      const answer = document.getElementById('answer').value.trim();
-      if (!currentQ) { alert('Get a question first'); return; }
-      if (!answer) { alert('Write your answer first'); return; }
+      const answer=document.getElementById('answer').value.trim();
+      if(!currentQ){showToast('Get a question first');return;}
+      if(!answer){showToast('Write your answer first');return;}
       stopMic();
+      const btn=document.querySelector('#actions .btn');
+      if(btn){btn.textContent='Submitting...';btn.disabled=true;}
       try {
-        const res = await fetch('http://127.0.0.1:8000/submit', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user_id: parseInt(userId), question: currentQ, answer, mode: topic}) });
-        const data = await res.json();
-        showResult(data);
-        loadStats();
-        loadWeeklyProgress();
-        trackSessionAttempt(currentQ, data.score, topic);
-      } catch(e) { alert('Error submitting. Check backend.'); }
+        const res=await fetch(API+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:parseInt(userId),question:currentQ,answer,mode:topic})});
+        const data=await res.json();
+        showResult(data); loadStats(); loadWeeklyProgress(); trackSessionAttempt(currentQ,data.score,topic);
+        showToast('✅ Submitted! Score: '+data.score+'/10');
+      } catch(e){showToast('❌ Error submitting. Check backend.');}
+      finally{if(btn){btn.textContent='Submit Answer';btn.disabled=false;}}
     }
 
-    function showResult(data) {
-      const score = data.score ?? 0;
-      document.getElementById('result-box').style.display = 'block';
-      document.getElementById('live-panel').style.display = 'none';
-      const sEl = document.getElementById('score-num');
-      sEl.textContent = score;
-      sEl.style.color = score >= 7 ? '#1D9E75' : score >= 4 ? '#EF9F27' : '#E24B4A';
-      const cp = data.correct_pct ?? 0;
-      const wp = data.wrong_pct ?? 0;
-      const ip = data.improvement_required ?? 0;
-      document.getElementById('pct-correct').style.width = cp + '%';
-      document.getElementById('val-correct').textContent = cp + '%';
-      document.getElementById('pct-wrong').style.width = wp + '%';
-      document.getElementById('val-wrong').textContent = wp + '%';
-      document.getElementById('pct-imp').style.width = ip + '%';
-      document.getElementById('val-imp').textContent = ip + '%';
-      const sc = data.scores || {};
-      const dims = [['clarity','Clarity'],['technical_accuracy','Tech accuracy'],['used_example','Used example'],['structure','Structure'],['completeness','Completeness']];
-      document.getElementById('dim-bars').innerHTML = dims.map(([k,l]) => {
-        const v = sc[k] ?? 0;
-        const pct = Math.min(100, v * 10);
-        const c = v >= 7 ? '#1D9E75' : v >= 4 ? '#EF9F27' : '#E24B4A';
-        return '<div class="bar-row"><span class="bar-label" style="width:130px;">' + l + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + c + ';"></div></div><span class="bar-val">' + v + '/10</span></div>';
-      }).join('');
-      document.getElementById('feedback-card').innerHTML =
-        '<div style="margin-bottom:7px;"><strong>Overall:</strong> ' + (data.overall_msg||'—') + '</div>' +
-        '<div style="margin-bottom:7px;"><strong>✅ Strength:</strong> ' + (data.strength||'—') + '</div>' +
-        '<div style="margin-bottom:7px;"><strong>⚠️ Weakness:</strong> ' + (data.weakness||'—') + '</div>' +
-        '<div style="padding:10px;background:#fff3cd;border-radius:6px;border-left:3px solid #EF9F27;margin-top:6px;"><strong>🎯 Round target:</strong> ' + (data.round_focus||'—') + '</div>';
-      const modeTips = data.mode_tips || [];
-      document.getElementById('issue-list').innerHTML = modeTips.length > 0
-        ? '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#1a1a2e;">📋 How to improve:</div>' + modeTips.map((t,i) => '<div style="display:flex;gap:8px;margin-bottom:6px;font-size:13px;color:#444;background:#f5f4ff;padding:8px 10px;border-radius:6px;"><span style="color:#534AB7;font-weight:700;flex-shrink:0;">' + (i+1) + '.</span><span>' + t + '</span></div>').join('') : '';
-      document.getElementById('model-ans').textContent = data.model_answer || '';
-      document.getElementById('ai-feedback').innerHTML =
-        '<div style="margin-bottom:6px;"><strong>Verdict:</strong> <span style="color:' + (score>=7?'#1D9E75':score>=4?'#EF9F27':'#E24B4A') + ';font-weight:600;">' + (data.verdict||'—') + ' — ' + cp + '% correct</span></div>' +
-        '<div style="margin-bottom:6px;"><strong>Needs improvement:</strong> ' + wp + '%</div>' +
-        '<div style="margin-bottom:6px;">' + (data.round_focus||'') + '</div>' +
-        '<div>' + (data.suggestion||'') + '</div>';
-      document.getElementById('result-box').scrollIntoView({behavior:'smooth'});
-    }
+    function showResult(data) { const score=data.score??0; document.getElementById('result-box').style.display='block'; document.getElementById('live-panel').style.display='none'; const sEl=document.getElementById('score-num'); sEl.textContent=score; sEl.style.color=score>=7?'#0d9e6e':score>=4?'#d97706':'#e24b4a'; const cp=data.correct_pct??0,wp=data.wrong_pct??0,ip=data.improvement_required??0; document.getElementById('pct-correct').style.width=cp+'%'; document.getElementById('val-correct').textContent=cp+'%'; document.getElementById('pct-wrong').style.width=wp+'%'; document.getElementById('val-wrong').textContent=wp+'%'; document.getElementById('pct-imp').style.width=ip+'%'; document.getElementById('val-imp').textContent=ip+'%'; const sc=data.scores||{}; const dims=[['clarity','Clarity'],['technical_accuracy','Tech accuracy'],['used_example','Used example'],['structure','Structure'],['completeness','Completeness']]; document.getElementById('dim-bars').innerHTML=dims.map(([k,l])=>{const v=sc[k]??0,pct=Math.min(100,v*10);const c=v>=7?'#0d9e6e':v>=4?'#d97706':'#e24b4a';return '<div class="bar-row"><span class="bar-label" style="width:130px;">'+l+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+c+';"></div></div><span class="bar-val">'+v+'/10</span></div>';}).join(''); document.getElementById('feedback-card').innerHTML='<div style="margin-bottom:7px;"><strong>Overall:</strong> '+(data.overall_msg||'—')+'</div><div style="margin-bottom:7px;"><strong>✅ Strength:</strong> '+(data.strength||'—')+'</div><div style="margin-bottom:7px;"><strong>⚠️ Weakness:</strong> '+(data.weakness||'—')+'</div><div style="padding:10px;background:#fef9ec;border-radius:6px;border-left:3px solid #d97706;margin-top:6px;"><strong>🎯 Round target:</strong> '+(data.round_focus||'—')+'</div>'; const modeTips=data.mode_tips||[]; document.getElementById('issue-list').innerHTML=modeTips.length>0?'<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#0f172a;">📋 How to improve:</div>'+modeTips.map((t,i)=>'<div style="display:flex;gap:8px;margin-bottom:6px;font-size:13px;color:#374151;background:#eff0fe;padding:8px 10px;border-radius:6px;"><span style="color:#1a4fc4;font-weight:700;flex-shrink:0;">'+(i+1)+'.</span><span>'+t+'</span></div>').join(''):''; document.getElementById('model-ans').textContent=data.model_answer||''; document.getElementById('ai-feedback').innerHTML='<div style="margin-bottom:6px;"><strong>Verdict:</strong> <span style="color:'+(score>=7?'#0d9e6e':score>=4?'#d97706':'#e24b4a')+';font-weight:600;">'+(data.verdict||'—')+' — '+cp+'% correct</span></div><div style="margin-bottom:6px;"><strong>Needs improvement:</strong> '+wp+'%</div><div>'+(data.suggestion||'')+'</div>'; document.getElementById('result-box').scrollIntoView({behavior:'smooth'}); }
 
     async function loadStats() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/stats/' + userId);
-        if (!res.ok) return;
-        const d = await res.json();
-        document.getElementById('m-total').textContent = d.total || 0;
-        document.getElementById('m-avg').textContent = d.avg || 0;
-        document.getElementById('m-best').textContent = d.best || 0;
-        const imp = d.improvement || 0;
-        const impEl = document.getElementById('m-imp');
-        impEl.textContent = (imp >= 0 ? '+' : '') + imp + '%';
-        impEl.className = 'metric-value ' + (imp >= 0 ? 'green' : 'red');
-        if (d.weakest) { document.getElementById('weakest-box').textContent = d.weakest.toUpperCase(); document.getElementById('weakest-tip').textContent = tips[d.weakest] || ''; }
-        const mc = {dsa:'#534AB7',hr:'#1D9E75',os:'#EF9F27',cn:'#E24B4A',system_design:'#0F6E56'};
-        const modes = d.modes || {};
-        if (Object.keys(modes).length > 0) {
-          document.getElementById('mode-bars').innerHTML = Object.entries(modes).map(([m,s]) => '<div class="bar-row"><span class="bar-label">' + m.toUpperCase() + '</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.min(100,s*10) + '%;background:' + (mc[m]||'#534AB7') + ';"></div></div><span class="bar-val">' + s + '</span></div>').join('');
-        }
-        const scores = d.scores_list || [];
-        if (chart) chart.destroy();
-        if (scores.length > 0) {
-          document.getElementById('no-data').style.display = 'none';
-          chart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: scores.map((_,i) => 'S'+(i+1)), datasets: [{data: scores, borderColor:'#534AB7', backgroundColor:'rgba(83,74,183,0.08)', borderWidth:2, pointRadius:3, pointBackgroundColor:'#534AB7', tension:0.4, fill:true}] }, options: {responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{font:{size:11},color:'#999'},grid:{color:'#f5f5f5'}},y:{min:0,max:10,ticks:{font:{size:11},color:'#999',stepSize:2},grid:{color:'#f5f5f5'}}}} });
-        } else { document.getElementById('no-data').style.display = 'block'; }
-        const recent = d.recent || [];
-        if (recent.length > 0) { document.getElementById('hist-list').innerHTML = recent.map(s => '<div class="hist-row"><span class="badge b-' + s.mode + '">' + s.mode.toUpperCase() + '</span><span style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">' + s.question + '</span><span style="font-weight:600;color:#534AB7;margin-left:8px;flex-shrink:0;">' + s.score + '/10</span></div>').join(''); }
-      } catch(e) { console.log('Stats error:', e); }
+        const res=await fetch(API+'/stats/'+userId); if(!res.ok) return; const d=await res.json();
+        document.getElementById('m-total').textContent=d.total||0;
+        document.getElementById('m-avg').textContent=d.avg||0;
+        document.getElementById('m-best').textContent=d.best||0;
+        const imp=d.improvement||0; const impEl=document.getElementById('m-imp');
+        impEl.textContent=(imp>=0?'+':'')+imp+'%'; impEl.className='metric-value '+(imp>=0?'green':'red');
+        if(d.weakest){document.getElementById('weakest-box').textContent=d.weakest.toUpperCase();document.getElementById('weakest-tip').textContent=tips[d.weakest]||'';}
+        const mc={dsa:'#1a4fc4',hr:'#0d9e6e',os:'#d97706',cn:'#e24b4a',system_design:'#0f6e56'};
+        const modes=d.modes||{};
+        if(Object.keys(modes).length>0){document.getElementById('mode-bars').innerHTML=Object.entries(modes).map(([m,s])=>'<div class="bar-row"><span class="bar-label">'+m.toUpperCase()+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,s*10)+'%;background:'+(mc[m]||'#1a4fc4')+';"></div></div><span class="bar-val">'+s+'</span></div>').join('');}
+        const scores=d.scores_list||[];
+        if(chart) chart.destroy();
+        if(scores.length>0){
+          document.getElementById('no-data').style.display='none';
+          chart=new Chart(document.getElementById('trendChart'),{type:'line',data:{labels:scores.map((_,i)=>'S'+(i+1)),datasets:[{data:scores,borderColor:'#1a4fc4',backgroundColor:'rgba(26,79,196,0.08)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#1a4fc4',tension:0.4,fill:true}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},color:'#94a3b8'},grid:{color:'#f1f4fb'}},y:{min:0,max:10,ticks:{font:{size:11},color:'#94a3b8',stepSize:2},grid:{color:'#f1f4fb'}}}}});
+        } else { document.getElementById('no-data').style.display='block'; }
+        const recent=d.recent||[];
+        if(recent.length>0){document.getElementById('hist-list').innerHTML=recent.map(s=>'<div class="hist-row"><span class="badge b-'+s.mode+'">'+s.mode.toUpperCase()+'</span><span style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+s.question+'</span><span style="font-weight:600;color:#1a4fc4;margin-left:8px;flex-shrink:0;">'+s.score+'/10</span></div>').join('');}
+      } catch(e){console.log('Stats error:',e);}
     }
 
-    // ── Speech ────────────────────────────────────────────
-    function setupSpeech() {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) { document.getElementById('mic-btn').style.display = 'none'; return; }
-      recog = new SR();
-      recog.continuous = true;
-      recog.interimResults = true;
-      recog.lang = 'en-IN';
-      recog.onresult = e => {
-        let t = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript;
-        document.getElementById('answer').value = t;
-        liveAnalyse();
-      };
-      recog.onerror = () => stopMic();
-    }
+    function setupSpeech() { const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){document.getElementById('mic-btn').style.display='none';return;} recog=new SR(); recog.continuous=true; recog.interimResults=true; recog.lang='en-IN'; recog.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript;document.getElementById('answer').value=t;liveAnalyse();}; recog.onerror=()=>stopMic(); }
+    function toggleMic() { isRec?stopMic():startMic(); }
+    function startMic() { if(!recog) return; recog.start(); isRec=true; const b=document.getElementById('mic-btn'); b.textContent='⏹ Stop'; b.style.background='#e24b4a'; b.style.color='#fff'; }
+    function stopMic() { if(recog) recog.stop(); isRec=false; const b=document.getElementById('mic-btn'); b.textContent='🎤 Speak'; b.style.background=''; b.style.color=''; }
 
-    function toggleMic() { isRec ? stopMic() : startMic(); }
-    function startMic() {
-      if (!recog) return;
-      recog.start(); isRec = true;
-      const b = document.getElementById('mic-btn');
-      b.textContent = '⏹ Stop'; b.style.background = '#ff4444'; b.style.color = '#fff';
-    }
-    function stopMic() {
-      if (recog) recog.stop(); isRec = false;
-      const b = document.getElementById('mic-btn');
-      b.textContent = '🎤 Speak'; b.style.background = ''; b.style.color = '';
-    }
-
-    setupSpeech();
-    loadStats();
-    loadWeeklyProgress();
+    setupSpeech(); loadStats(); loadWeeklyProgress();
+    fetch(API + '/').catch(() => {});
   </script>
 </body>
 </html>
