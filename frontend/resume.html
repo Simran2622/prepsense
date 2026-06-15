@@ -122,7 +122,7 @@
     </div>
   </div>
   <script>
-    const API = 'http://localhost:8000';
+    const API = 'https://prepsense-a098.onrender.com';
     document.getElementById('uname').textContent = localStorage.getItem('user_name') || '';
     function logout() { localStorage.clear(); window.location.href = 'index.html'; }
     fetch(API + '/').catch(() => {});
