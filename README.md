@@ -8,6 +8,48 @@ The platform enables users to practice interview questions across multiple domai
 
 ---
 
+## Live Demo
+
+### Frontend
+https://iridescent-paletas-a2a6f4.netlify.app
+
+### Backend
+https://prepsense-a098.onrender.com
+
+---
+
+## Screenshots
+
+### Landing Page
+
+![Landing Page](screenshots/landing%20page.png)
+
+### Dashboard
+
+![Dashboard](screenshots/Dashboard.png)
+
+### Analytics Dashboard
+
+![Analytics Dashboard](screenshots/Analytics.png)
+
+### Interview Module
+
+![Interview Module](screenshots/Interview.png)
+
+### Webcam Analysis
+
+![Webcam Analysis](screenshots/WebCam.png)
+
+### Resume Analyzer
+
+![Resume Analyzer](screenshots/Resuma%20Analyzer.png)
+
+### Personalized Feedback
+
+![Personalized Feedback](screenshots/Personalized%20Feedback.png)
+
+---
+
 ## Features
 
 ### Authentication System
@@ -22,7 +64,7 @@ The platform enables users to practice interview questions across multiple domai
 - HR Interview Preparation
 - System Design Interview Practice
 
-### Answer Evaluation Engine
+### Intelligent Answer Evaluation
 - Rule-based answer assessment
 - Keyword coverage analysis
 - Automated scoring
@@ -127,8 +169,8 @@ This project was developed as a team project, and my primary contribution was fr
 ### Responsibilities
 
 - Designed and developed responsive user interfaces using HTML, CSS, and JavaScript.
-- Built the Landing Page, Login Page, Signup Page, Dashboard, Interview Interface, Analytics Screens, and Resume Analysis UI.
-- Developed interactive dashboards displaying interview scores, session history, topic-wise performance, and progress reports.
+- Built the Landing Page, Login Page, Signup Page, Dashboard, Interview Interface, Analytics Screens, Resume Analyzer UI, and Personalized Feedback screens.
+- Developed interactive dashboards displaying interview scores, progress reports, topic-wise performance, and session analytics.
 - Integrated frontend components with backend REST APIs.
 - Implemented webcam-based interview monitoring interfaces.
 - Handled client-side validation and user interactions.
@@ -152,29 +194,34 @@ This project was developed as a team project, and my primary contribution was fr
 - API Integration
 - Dashboard Development
 - User Experience Design
-- Deployment and Testing
+- Frontend Deployment
+- Debugging and Testing
+- Working with REST APIs
+
+---
+
+## Challenges Faced
+
+- Integrating frontend interfaces with backend APIs.
+- Designing responsive dashboards for different screen sizes.
+- Implementing webcam-based monitoring interfaces.
+- Managing dynamic interview data and analytics visualizations.
+- Ensuring smooth user experience across multiple modules.
+- Deploying frontend and backend services separately.
 
 ---
 
 ## Future Enhancements
 
-- AI-powered answer evaluation
-- Speech analysis and communication feedback
-- Resume-job matching
-- Personalized learning roadmaps
-- PostgreSQL integration
-- JWT authentication
-- AWS deployment
-
----
-
-## Live Demo
-
-### Frontend
-https://iridescent-paletas-a2a6f4.netlify.app
-
-### Backend
-https://prepsense-a098.onrender.com
+- AI-powered answer evaluation using LLMs.
+- Speech analysis and communication feedback.
+- Resume-job description matching.
+- Personalized learning roadmaps.
+- PostgreSQL integration.
+- JWT authentication.
+- AWS deployment.
+- Real-time voice interviews.
+- Company-specific interview preparation tracks.
 
 ---
 
