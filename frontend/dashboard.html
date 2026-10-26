@@ -342,24 +342,39 @@
     function stopCamera() { if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} if(camInterval){clearInterval(camInterval);camInterval=null;} const feed=document.getElementById('cam-feed'); if(feed) feed.srcObject=null; const status=document.getElementById('cam-status'); if(status){status.textContent='Camera stopped.';status.style.color='#94a3b8';} }
 
     function analyseCameraFrame() {
-      const video=document.getElementById('cam-feed'); const canvas=document.getElementById('cam-canvas');
-      if(!video||!camStream) return;
-      const ctx=canvas.getContext('2d'); ctx.drawImage(video,0,0,200,150);
-      const frame=ctx.getImageData(0,0,200,150); const data=frame.data;
-      let brightness=0; for(let i=0;i<data.length;i+=4) brightness+=(data[i]+data[i+1]+data[i+2])/3; brightness=brightness/(data.length/4);
-      const lightPct=Math.min(100,Math.round((brightness/255)*180));
-      let centreBrightness=0,centreCount=0; for(let y=30;y<120;y++) for(let x=60;x<140;x++){const idx=(y*200+x)*4;centreBrightness+=(data[idx]+data[idx+1]+data[idx+2])/3;centreCount++;} centreBrightness=centreBrightness/centreCount;
-      const faceInCentre=centreBrightness>60&&centreBrightness<220;
-      const eyePct=faceInCentre?Math.min(100,Math.round(centreBrightness/2)):20;
-      let upperB=0,lowerB=0; for(let y=0;y<75;y++) for(let x=0;x<200;x++){const idx=(y*200+x)*4;upperB+=(data[idx]+data[idx+1]+data[idx+2])/3;} for(let y=75;y<150;y++) for(let x=0;x<200;x++){const idx=(y*200+x)*4;lowerB+=(data[idx]+data[idx+1]+data[idx+2])/3;}
-      const postureGood=upperB>lowerB*0.8; const posturePct=postureGood?Math.min(100,Math.round(eyePct*0.9)):35;
-      const focusPct=faceInCentre?Math.min(100,Math.round((centreBrightness/220)*100)):30;
-      document.getElementById('cam-eye').style.width=eyePct+'%'; document.getElementById('cam-eye-val').textContent=eyePct+'%';
-      document.getElementById('cam-posture').style.width=posturePct+'%'; document.getElementById('cam-posture-val').textContent=posturePct+'%';
-      document.getElementById('cam-light').style.width=lightPct+'%'; document.getElementById('cam-light-val').textContent=lightPct+'%';
-      document.getElementById('cam-focus').style.width=focusPct+'%'; document.getElementById('cam-focus-val').textContent=focusPct+'%';
-      let tip=''; if(brightness<60) tip='💡 Too dark — move to a brighter area.'; else if(brightness>200) tip='☀️ Too bright — reduce backlight.'; else if(!faceInCentre) tip='📷 Centre yourself in the frame.'; else if(!postureGood) tip='🧍 Sit up straight — shoulders level.'; else if(eyePct<50) tip='👁 Look at the camera, not your screen.'; else tip='✅ Looking good! Maintain this posture.';
-      document.getElementById('cam-tip').textContent=tip;
+      const video = document.getElementById('cam-feed');
+      const canvas = document.getElementById('cam-canvas');
+      if (!video || !camStream || video.readyState < 2) return;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, 200, 150);
+      const pixels = ctx.getImageData(0, 0, 200, 150).data;
+      let total = 0;
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        total += (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+      }
+
+      const brightness = total / (pixels.length / 4);
+      const lightPct = Math.min(100, Math.round(brightness / 255 * 100));
+      const lightBar = document.getElementById('cam-light');
+      const lightValue = document.getElementById('cam-light-val');
+      lightBar.style.width = lightPct + '%';
+      lightValue.textContent = lightPct + '%';
+
+      document.getElementById('cam-eye').style.width = '0%';
+      document.getElementById('cam-eye-val').textContent = 'Not detected';
+      document.getElementById('cam-posture').style.width = '0%';
+      document.getElementById('cam-posture-val').textContent = 'Not detected';
+      document.getElementById('cam-focus').style.width = '0%';
+      document.getElementById('cam-focus-val').textContent = 'Not measured';
+
+      const tip = brightness < 60
+        ? 'Lighting is low — try a brighter area.'
+        : brightness > 200
+          ? 'Lighting is very bright — reduce backlight if possible.'
+          : 'Lighting looks reasonable. Eye contact and posture detection are not enabled.';
+      document.getElementById('cam-tip').textContent = tip;
     }
 
     async function getModelAnswer() { const q=document.getElementById('model-q-input').value.trim(); if(!q){showToast('Type a question first');return;} const box=document.getElementById('model-answer-box'); const pts=document.getElementById('model-key-points'); box.style.display='block'; box.textContent='Generating...'; pts.style.display='none'; try { const res=await fetch(API+'/model-answer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,mode:topic})}); const data=await res.json(); box.textContent=data.model_answer||'No answer available.'; if(data.key_points&&data.key_points.length>0){pts.style.display='block';pts.innerHTML='<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#0f172a;">🔑 Key points:</div>'+data.key_points.map(p=>'<div style="font-size:12px;color:#374151;padding:5px 10px;background:#eff0fe;border-radius:6px;margin-bottom:4px;">• '+p+'</div>').join('');} } catch(e){box.textContent='Could not fetch model answer.';} }
